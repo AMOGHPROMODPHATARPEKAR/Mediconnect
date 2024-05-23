@@ -1,14 +1,14 @@
-import "./app.css";
+import "./App.css";
+import Layout from "./layout/Layout";
+
+
 
 function App() {
 
 
-  return (
-    <>
-      <h1 className=' bg-blue-500 text-cyan-400 font-serif   '>Hello sdsd</h1>
+  return  <Layout/>
       
-    </>
-  )
+
 }
 
 export default App
