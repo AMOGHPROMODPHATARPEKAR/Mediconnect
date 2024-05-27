@@ -3,6 +3,7 @@ import doctorImg from '../../assets/images/doctor-img02.png'
 import starIcon from '../../assets/images/Star.png'
 import DoctorAbout from './DoctorAbout'
 import Feedback from './Feedback'
+import SlidePanel from './SlidePanel'
 
 
 const DoctorDetails = () => {
@@ -64,10 +65,12 @@ text-textColor">(272)</span>
             tab === 'feedback' && <Feedback/>
           }
         </div>
-          {/* 16:04 */}
+          
         </div>
 
-        <div></div>
+        <div>
+          <SlidePanel/>
+        </div>
       </div>
     </div>
   </section>
