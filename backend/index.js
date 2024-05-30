@@ -1,15 +1,32 @@
+import cors from 'cors';
 import express from 'express';
+import cookieParser from 'cookie-parser'
 import dotenv from "dotenv"
-import cors from 'cors'
 import mongoose from 'mongoose';
-import cookieParser from 'cookie-parser';
 import authRoute from './Routes/auth.js'
 
 const app = express();
+const PORT = process.env.PORT || 8000; 
 
-const corsOptions = {
-    origin:true
-}
+
+dotenv.config({
+  path:'./.env'
+})
+
+console.log(process.env.MANGODB_URL)
+
+app.use(cors({
+  origin:process.env.CORS_ORIGIN,
+  // credentials:true
+}))
+
+app.use(express.json({
+  limit:"16kb"
+}))
+
+app.use(express.urlencoded({extended:true,limit:"16kb"}))
+app.use(cookieParser())
+
 
 //database
 
@@ -18,11 +35,12 @@ mongoose.set('strictQuery',false)
 const connectDB = async()=>{
     try {
         
-        const connectionIn = await mongoose.connect('mongodb+srv://amoghpp:amogh123@amogh.9k2ydve.mongodb.net/Mediconnect',{
+        const connectionIn = await mongoose.connect(`${process.env.MANGODB_URL}/Mediconnect`,{
             useNewUrlParser:true,
             useUnifiedTopology:true
         })
-        console.log("MongoDb database is connected",connectionIn.connection.host)
+
+        console.log("MongoDb database is connected")
 
     } catch (error) {
         console.log("mongo database connection failed")
@@ -31,20 +49,31 @@ const connectDB = async()=>{
 
 
 
-const PORT = process.env.PORT || 8000;  // Change this to your desired port
 
-app.get('/', (req, res) => {
-  res.send('Hello, world!');
-});
 
-//middleware
+  
+  app.get('/', (req, res) => {
+      res.send('Hello, world!');
+    });
+    
+    
+    const corsOptions = {
+        origin:true
+    }   
+
+    //middleware
+app.use(express.urlencoded({extended:true,limit:"16kb"}))
 app.use(express.json())
 app.use(cookieParser())
 app.use(cors(corsOptions))
+
+//routes
 app.use('/api/v1/auth',authRoute);
 
 
 app.listen(PORT, () => {
     connectDB();
-  console.log(`Server running on port ${PORT}`);
+  console.log(`Server is running on http://localhost:${PORT}`);
 });
+
+
