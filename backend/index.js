@@ -4,6 +4,8 @@ import cookieParser from 'cookie-parser'
 import dotenv from "dotenv"
 import mongoose from 'mongoose';
 import authRoute from './Routes/auth.js'
+import userRoute from './Routes/user.js'
+
 
 const app = express();
 const PORT = process.env.PORT || 8000; 
@@ -13,7 +15,6 @@ dotenv.config({
   path:'./.env'
 })
 
-console.log(process.env.MANGODB_URL)
 
 app.use(cors({
   origin:process.env.CORS_ORIGIN,
@@ -47,21 +48,12 @@ const connectDB = async()=>{
     }
 }
 
-
-
-
-
-  
-  app.get('/', (req, res) => {
-      res.send('Hello, world!');
-    });
-    
     
     const corsOptions = {
         origin:true
     }   
 
-    //middleware
+//middleware
 app.use(express.urlencoded({extended:true,limit:"16kb"}))
 app.use(express.json())
 app.use(cookieParser())
@@ -69,7 +61,7 @@ app.use(cors(corsOptions))
 
 //routes
 app.use('/api/v1/auth',authRoute);
-
+app.use('/api/v1/user',userRoute)
 
 app.listen(PORT, () => {
     connectDB();
