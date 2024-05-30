@@ -105,9 +105,9 @@ export const login = async(req,res)=>{
         }
 
         if(doctor)
-            {
-                doctor = patient;
-            }
+        {
+                user = doctor;
+         }
         
         if(!user)
             {

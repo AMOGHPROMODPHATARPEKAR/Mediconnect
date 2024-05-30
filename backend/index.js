@@ -5,7 +5,7 @@ import dotenv from "dotenv"
 import mongoose from 'mongoose';
 import authRoute from './Routes/auth.js'
 import userRoute from './Routes/user.js'
-
+import doctorRoute from './Routes/doctor.js'
 
 const app = express();
 const PORT = process.env.PORT || 8000; 
@@ -61,7 +61,8 @@ app.use(cors(corsOptions))
 
 //routes
 app.use('/api/v1/auth',authRoute);
-app.use('/api/v1/user',userRoute)
+app.use('/api/v1/user',userRoute);
+app.use('/api/v1/doctor',doctorRoute);
 
 app.listen(PORT, () => {
     connectDB();

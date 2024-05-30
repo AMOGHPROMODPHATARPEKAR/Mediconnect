@@ -1,7 +1,7 @@
-import User from "../models/UserSchema.js"
+import Doctor from "../models/DoctorSchema.js"
 
 
-export const updateUser = async(req,res)=>{
+export const updateDoctor = async(req,res)=>{
 
     const id =  req.params.id;
 
@@ -18,18 +18,18 @@ export const updateUser = async(req,res)=>{
 
     try {
 
-        const updateUser = await User.findByIdAndUpdate(
+        const updateDoctor = await Doctor.findByIdAndUpdate(
             id,
             {$set:req.body},
             {new:true}
         )
 
-        if(!updateUser)
+        if(!updateDoctor)
             {
                 return res.status(400)
                 .json({
                     status:false,
-                    message:"User not available",
+                    message:"Doctor not available",
                     
                 })
             }
@@ -37,8 +37,8 @@ export const updateUser = async(req,res)=>{
         return res.status(200)
                 .json({
                     status:true,
-                    message:"Successfully updated User",
-                    data:updateUser
+                    message:"Successfully updated Doctor",
+                    data:updateDoctor
                 })
         
     } catch (error) {
@@ -46,36 +46,36 @@ export const updateUser = async(req,res)=>{
         return res.status(500)
                 .json({
                     status:false,
-                    message:"Error in Updating User"
+                    message:"Error in Updating Doctor"
                 })
         
     }
 
 }
-export const getUser = async(req,res)=>{
+export const getDoctor = async(req,res)=>{
 
     const id =  req.params.id;
 
     try {
 
-        const user = await User.findById(
+        const doctor = await Doctor.findById(
             id
         ).select("-password")
 
-        if(!user)
+        if(!doctor)
             {
                 return res.status(400)
                 .json({
                     status:false,
-                    message:"User not available",
+                    message:"Doctor not available",
                     
                 })
             }
         return res.status(200)
                 .json({
                     status:true,
-                    message:"Successfully fetched User",
-                    data:user
+                    message:"Successfully fetched Doctor",
+                    data:doctor
                 })
         
     } catch (error) {
@@ -83,26 +83,26 @@ export const getUser = async(req,res)=>{
         return res.status(500)
                 .json({
                     status:false,
-                    message:"Error in fetcing User"
+                    message:"Error in fetcing Doctor"
                 })
         
     }
 
 }
-export const deleteUser = async(req,res)=>{
+export const deleteDoctor = async(req,res)=>{
 
     const id =  req.params.id;
 
     try {
 
-        const deletedUser = await User.findByIdAndDelete(id);
+        const deletedDoctor = await Doctor.findByIdAndDelete(id);
 
-        if(!deletedUser)
+        if(!deletedDoctor)
             {
                 return res.status(400)
                 .json({
                     status:false,
-                    message:"User not available",
+                    message:"Doctor not available",
                     
                 })
             }
@@ -110,8 +110,8 @@ export const deleteUser = async(req,res)=>{
         return res.status(200)
                 .json({
                     status:true,
-                    message:"Successfully deleted User",
-                    data:deletedUser
+                    message:"Successfully deleted Doctor",
+                    data:deletedDoctor
                 })
         
     } catch (error) {
@@ -119,24 +119,24 @@ export const deleteUser = async(req,res)=>{
         return res.status(500)
                 .json({
                     status:false,
-                    message:"Error in deleting User"
+                    message:"Error in deleting Doctor"
                 })
         
     }
 
 }
-export const getAllUsers = async(req,res)=>{
+export const getAllDoctors = async(req,res)=>{
 
 
     try {
 
-        const users = await User.find({}).select("-password")
+        const Doctors = await Doctor.find({}).select("-password")
 
         return res.status(200)
                 .json({
                     status:true,
-                    message:"Successfully fetced All Users",
-                    data:users
+                    message:"Successfully fetced All Doctors",
+                    data:Doctors
                 })
         
     } catch (error) {
@@ -144,7 +144,7 @@ export const getAllUsers = async(req,res)=>{
         return res.status(500)
                 .json({
                     status:false,
-                    message:"Error in fetching All Users "
+                    message:"Error in fetching All Doctors "
                 })
         
     }
