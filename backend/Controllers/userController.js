@@ -55,7 +55,7 @@ export const updateUser = async(req,res)=>{
 export const getUser = async(req,res)=>{
 
     const id =  req.params.id;
-
+    
     try {
 
         const user = await User.findById(

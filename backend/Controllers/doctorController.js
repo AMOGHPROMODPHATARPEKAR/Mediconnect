@@ -60,7 +60,8 @@ export const getDoctor = async(req,res)=>{
 
         const doctor = await Doctor.findById(
             id
-        ).select("-password")
+        ).populate("reviews")
+        .select("-password")
 
         if(!doctor)
             {
@@ -129,14 +130,41 @@ export const getAllDoctors = async(req,res)=>{
 
 
     try {
+        const {query} = req.query
 
-        const Doctors = await Doctor.find({}).select("-password")
+        let doctors;
+
+        if(query)
+            {
+                doctors = await Doctor.find({isApproved:'approved',
+                 $or:[
+                    {name:{$regex:query, $oprions:"i"}},
+                    {specialization:{$regex:query, $oprions:"i"}}
+                 ]})
+            }
+            else
+            {
+                doctors = await Doctor.find({isApproved:'approved'}).select("-password")
+            }
+
+            if(!doctors)
+                {
+                    return res.status(400)
+                    .json({
+                        status:false,
+                        message:"Unable to fetch  Doctors"
+                    })
+                }
+
+
+
+         
 
         return res.status(200)
                 .json({
                     status:true,
                     message:"Successfully fetced All Doctors",
-                    data:Doctors
+                    data:doctors
                 })
         
     } catch (error) {
