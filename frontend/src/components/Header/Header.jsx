@@ -34,7 +34,7 @@ const Header = () => {
   const menuRef = useRef(null)
 
   const {user,role,token} = useContext(authContext);
-
+  console.log(user)
   const handleStickyHeader = ()=>{
     window.addEventListener('scroll',()=>{
       if(document.body.scrollTop > 80 || document.documentElement.scrollTop >80 ){
@@ -85,7 +85,7 @@ const Header = () => {
 
         {token && user ?(
           <div>
-          <Link to='/user/profile/me'>
+          <Link to={`/${role}/profile/me`}>
           <figure className=' w-[35px] h-[35px] rounded-full '>
           <img src={user?.photo} alt="" className=' w-full rounded-full' />
           </figure>
