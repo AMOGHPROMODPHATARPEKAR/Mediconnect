@@ -1,5 +1,6 @@
 import User from "../models/UserSchema.js"
-
+import Booking from '../models/BookingSchema.js'
+import Doctor from '../models/DoctorSchema.js'
 
 export const updateUser = async(req,res)=>{
 
@@ -149,4 +150,80 @@ export const getAllUsers = async(req,res)=>{
         
     }
 
+}
+
+export const getUserProfile = async(req,res)=>{
+
+    const userId =  req.userId;
+    
+    try {
+
+        const user = await User.findById(
+            userId
+        ).select("-password")
+
+        if(!user)
+            {
+                return res.status(400)
+                .json({
+                    status:false,
+                    message:"User not available",
+                    
+                })
+            }
+        return res.status(200)
+                .json({
+                    status:true,
+                    message:"Successfully fetched User Profile",
+                    data:user
+                })
+        
+    } catch (error) {
+
+        return res.status(500)
+                .json({
+                    status:false,
+                    message:"Error in fetcing User"
+                })
+        
+    }
+
+}
+
+export const getMyAppointments = async(req,res)=>{
+    try {
+        
+        //step1 :retrieve appointments from booking for specific user
+
+        const booking = await Booking.find({user:req.userId})
+
+        //step2 : extract doctor ids from appointement booking
+
+        const doctorIds = booking.map(el=>el.doctor.id);
+
+        //step3 :retrive doctors using doctorID
+        const doctors = await Doctor.find({_id:{$in:doctorIds}}).select("-password")
+
+        if(!doctors){
+            return res.status(400)
+            .json({
+                success:false,
+                message:"No doctors found some error"
+            })
+        }
+        return res.status(200)
+        .json({
+            success:true,
+            message:"Appointment doctor ",
+            data:doctors
+        })
+
+
+    } catch (error) {
+        return res.status(500)
+            .json({
+                success:false,
+                message:"No Appointment found some error"
+            })
+    }
 }

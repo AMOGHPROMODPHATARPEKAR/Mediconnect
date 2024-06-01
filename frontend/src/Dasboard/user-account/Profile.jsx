@@ -1,27 +1,37 @@
-import React, { useState } from 'react'
-import signupImg from '../assets/images/signup.gif'
-import { Link, useNavigate } from 'react-router-dom'
-import uploadToCloudinary from '../utils/uploadToCloudinary.js'
+import React, { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import uploadToCloudinary from '../../utils/uploadToCloudinary.js'
 import { toast } from 'react-toastify'
 import HashLoader from 'react-spinners/HashLoader.js'
+import {token} from '../../config.js'
 
-const Signup = () => {
 
-  const [selectedFile,setSelectedFile] = useState(null)
-  const [previewURL,setPreviewURL] =useState("")
+
+
+const Profile = ({user}) => {
+
+  
   const [loading,setLoading] = useState(false)
  
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+
+   
 
   const [formData,setFormData] = useState({
     name:'',
     email:'',
     password:'',
-    photo:selectedFile,
+    photo:null,
     gender:'male',
-    role:'patient'
+    bloodType:''
 
   })
+
+  useEffect(()=>{
+
+    setFormData({name:user.name, email:user.email, photo:user.photo, gender:user.gender, bloodType:user.bloodType})
+
+  },[user])
 
   const handleChange = (e) =>{
     setFormData({...formData, [e.target.name]:e.target.value})
@@ -39,8 +49,8 @@ const Signup = () => {
         return
       }
 console.log(data)
-    setPreviewURL(data.url)
-    setSelectedFile(data.url)
+    
+    
     setFormData({...formData,photo:data.url})
 
   }
@@ -51,10 +61,11 @@ console.log(data)
     setLoading(true);
 
     try {
-      const res = await fetch('/api/v1/auth/register',{
-        method:'post',
+      const res = await fetch(`/api/v1/user/${user._id}`,{
+        method:'put',
         headers:{
-          'Content-Type':'application/json'
+          'Content-Type':'application/json',
+          Authorization:`Bearer ${token}`
         },
         body:JSON.stringify(formData)
       })
@@ -66,7 +77,7 @@ console.log(data)
       }
   
       toast.success(message)
-      navigate('/login')
+      navigate('/')
     } catch (error) {
       
       toast.error(error.message)
@@ -74,32 +85,18 @@ console.log(data)
     }finally{
       setLoading(false)
     }
-
-
   }
 
-  
-
-  return <section className="px-5" >
-    <div className="max-w-[1170px] mx-auto">
-      <div className="grid grid-cols-1 lg:grid-cols-2">
-        <div className="hidden lg:block bg-primaryColor rounded-l-lg">
-          <figure className="rounded-l-lg">
-            <img src={signupImg} alt="" className="w-full rounded-l-lg" />
-          </figure>
-        </div>
-
-        <div className="rounded-l-lg lg:pl-16 py-10">
-          <h3 className="text-heading Color text-[22px] leading-9 font-bold mb-10">Create an <span className="text-primaryColor">Account</span></h3>
-
-          <form onSubmit={submitHandler}>
+  return (
+    <div className=' mt-10'>
+      <form onSubmit={submitHandler}>
           <div className=' mb-5'>
             <input type="text" placeholder='Enter your Full Name'  
             name='name' 
             value={formData.name}
             onChange={handleChange}
             className="w-full px-4 py-3 border-b border-solid border-[#0066ff61] focus:outline-none focus:border-b-primaryColor text-[16px] leading-7 text-headingColor placeholder:text-textColor cursor-pointer"
-            required
+            
             />
           </div>
           <div className=' mb-5'>
@@ -109,7 +106,8 @@ console.log(data)
             onChange={handleChange}
             name='email' 
             className="w-full px-4 py-3 border-b border-solid border-[#0066ff61] focus:outline-none focus:border-b-primaryColor text-[16px] leading-7 text-headingColor placeholder:text-textColor cursor-pointer"
-            required
+            aria-readonly
+            readOnly
             />
             </div>
           <div className=' mb-5'>
@@ -119,31 +117,32 @@ console.log(data)
             onChange={handleChange}
             name='password' 
             className="w-full px-4 py-3 border-b border-solid border-[#0066ff61] focus:outline-none focus:border-b-primaryColor text-[16px] leading-7 text-headingColor placeholder:text-textColor cursor-pointer"
-            required
+           
+            />
+          </div>
+
+          <div className=' mb-5'>
+            <input type="text"
+             placeholder='Blood type' 
+             value={formData.bloodType}
+            onChange={handleChange}
+            name='bloodType' 
+            className="w-full px-4 py-3 border-b border-solid border-[#0066ff61] focus:outline-none focus:border-b-primaryColor text-[16px] leading-7 text-headingColor placeholder:text-textColor cursor-pointer"
+            
             />
           </div>
 
 
           <div className="mb-5 flex items-center justify-between gap-3">
-            <label className="text-heading Color font-bold text-[16px] leading-7">
-              Are you a:
-              <select name="role" 
-              value={formData.role}
-              onChange={handleChange}
-              className="text-textColor font-semibold text-[15px] leading-7 px-4 py-3
-focus:outline-none">
-                <option value="patient">Patient</option>
-                <option value="doctor">Doctor</option>
-              </select>
-            </label>
+            
             <label className="text-headingColor font-bold text-[16px] leading-7">
               Gender:
               <select name="gender" 
               value={formData.gender}
               onChange={handleChange}
-              className="text-textColor font-semibold text-[15px] leading-7 px-4 py-3
+              className="text-textColor font-semibold text-[15px] leading-7 px-4 py-3 rounded-md ml-2
 focus:outline-none">
-                <option value="male">Male</option>
+                <option value="male" >Male</option>
                 <option value="female">Female</option>
                 <option value="others">Others</option>
               </select>
@@ -151,8 +150,8 @@ focus:outline-none">
           </div>
 
           <div className=' mb-5 flex items-center gap-3'>
-           { selectedFile && ( <figure className=' w-[60px] h-[60px] rounded-full border-2 border-solid border-primaryColor flex items-center justify-center '>
-              <img src={previewURL} alt=""  className=' w-full rounded-full' />
+           { formData.photo && ( <figure className=' w-[60px] h-[60px] rounded-full border-2 border-solid border-primaryColor flex items-center justify-center '>
+              <img src={formData.photo} alt=""  className=' w-full rounded-full' />
             </figure>) }
 
             <div className=' relative w-[130px] h-[50px] '>
@@ -172,19 +171,15 @@ focus:outline-none">
           <div className=' mt-7'>
             <button type='submit'
             disabled={loading && true}
-            
             className='w-full
-             bg-primaryColor text-white text-[18px] leading-[30px] rounded-lg px-4 py-3 ' >{loading ?<HashLoader size={35}color='#ffffff'  /> :'Sign Up'}</button>
+             bg-primaryColor text-white text-[18px] leading-[30px] rounded-lg px-4 py-3 ' >{loading ?<HashLoader size={25}color='#ffffff'  /> :'Update'}</button>
           </div>
 
-          <p className=' mt-5 text-center text-textColor'> Already have an account?. <Link to='/login' className=' text-primaryColor font-medium ml-1 '>Sign-In</Link></p>
+          
 
           </form>
-        </div>
-
-      </div>
     </div>
-  </section>
+  )
 }
 
-export default Signup
+export default Profile
