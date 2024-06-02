@@ -106,8 +106,7 @@ console.log(data)
             onChange={handleChange}
             name='email' 
             className="w-full px-4 py-3 border-b border-solid border-[#0066ff61] focus:outline-none focus:border-b-primaryColor text-[16px] leading-7 text-headingColor placeholder:text-textColor cursor-pointer"
-            aria-readonly
-            readOnly
+            
             />
             </div>
           <div className=' mb-5'>

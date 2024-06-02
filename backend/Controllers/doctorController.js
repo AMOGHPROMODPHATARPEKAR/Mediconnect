@@ -131,16 +131,16 @@ export const getAllDoctors = async(req,res)=>{
 
 
     try {
-        const {query} = req.query
-
+        const query = req.query.query
+        console.log(query)
         let doctors;
 
         if(query)
             {
                 doctors = await Doctor.find({isApproved:'approved',
                  $or:[
-                    {name:{$regex:query, $oprions:"i"}},
-                    {specialization:{$regex:query, $oprions:"i"}}
+                    {name:{$regex:query, $options:"i"}},
+                    {specialization:{$regex:query, $options:"i"}}
                  ]})
             }
             else
@@ -173,7 +173,7 @@ export const getAllDoctors = async(req,res)=>{
         return res.status(500)
                 .json({
                     status:false,
-                    message:"Error in fetching All Doctors "
+                    message:error.message
                 })
         
     }

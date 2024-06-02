@@ -7,6 +7,7 @@ import Tabs from './Tabs.jsx'
 import starIcon from '../../assets/images/Star.png'
 import DoctorAbout from '../../pages/Doctors/DoctorAbout.jsx'
 import Profile from './Profile.jsx'
+import Appointments from './Appointments.jsx'
 
 const Dashboard = () => {
 
@@ -80,11 +81,11 @@ text-[12px] leading-4 lg:text-[16px] lg:leading-6 font-semibold">
                   </div>}
 
 
-                {tab === 'appointments' && <div>Apooint</div> 
+                {tab === 'appointments' && <Appointments appointments={data?.appointments}/> 
                 }
 
 
-                {tab === 'profile' && <Profile/>}
+                {tab === 'profile' && <Profile doctorData={data} />}
               </div>
 
           </div>

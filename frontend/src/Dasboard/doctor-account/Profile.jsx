@@ -1,28 +1,48 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {AiOutlineDelete} from 'react-icons/ai'
 import uploadToCloudinary from '../../utils/uploadToCloudinary'
 import { toast } from 'react-toastify'
 import {token} from '../../config.js'
+import { useNavigate } from 'react-router-dom'
+import HashLoader from 'react-spinners/HashLoader.js'
 
 const Profile = ({doctorData}) => {
 
     const [formData, setFormData] = useState({
         name:'',
         email:'',
-        password:'',
         phone:0,
         bio:'',
         gender:'',
         specialization:'',
         ticketPrice:0,
         about:'',
-        qualifications:[{startingData:"", endingDate:"",degree:"",university:""}],
-        experiences:[{startingData:"", endingDate:"",position:"",hospital:""}],
-        timeSlots:[{day:'',startingTime:"", endingTime:""}],
+        qualifications:[],
+        experiences:[],
+        timeSlots:[],
         photo:null
 
-    })
+    });
 
+    useEffect(()=>{
+        setFormData({
+            name:doctorData?.name,
+            email:doctorData?.email,
+            phone:doctorData?.phone,
+            bio:doctorData?.bio,
+            gender:doctorData?.bio,
+            specialization:doctorData?.specialization,
+            ticketPrice:doctorData?.ticketPrice,
+            qualifications:doctorData?.qualifications,
+            experiences:doctorData?.experiences,
+            timeSlots:doctorData?.timeSlots,
+            about:doctorData?.about,
+            photo:doctorData?.photo
+        })
+    },[doctorData])
+
+    const [loading,setLoading] = useState(false)
+    const navigate = useNavigate()
     const handleChange = (e) =>{
         setFormData({...formData, [e.target.name]:e.target.value})
         
@@ -48,6 +68,7 @@ const Profile = ({doctorData}) => {
         e.preventDefault();
 
         try {
+            setLoading(true);
 
             const res = await fetch(`/api/v1/doctor/${doctorData._id}`,{
                method:'put',
@@ -58,17 +79,22 @@ const Profile = ({doctorData}) => {
                body:JSON.stringify(formData)
             })
 
-            const result = await res.json();
+            const {message} = await res.json();
 
             if(!res.ok)
                 {
-                 throw new Error(result.message)
+                 throw new Error(message)
                 }
             
-            toast.success(result.message)
+                console.log(message);
+
+                toast.success(message)
+            navigate('/home')
             
         } catch (error) {
             toast.error(error.message)
+        }finally{
+            setLoading(false)
         }
 
       }
@@ -105,7 +131,7 @@ const Profile = ({doctorData}) => {
         e.preventDefault();
 
         addItem('qualifications',{
-            startingData:"",
+            startingDate:"",
              endingDate:"",
              degree:"",
              university:""})
@@ -126,7 +152,7 @@ const Profile = ({doctorData}) => {
 
         addItem('experiences',
         {
-            startingData:"", 
+            startingDate:"", 
             endingDate:"",
             position:"",
             hospital:""
@@ -162,7 +188,6 @@ const Profile = ({doctorData}) => {
         deleteItem('timeSlots',index);
       }
 
-
   return (
     <div>
     <h2>Profile Information</h2>
@@ -190,10 +215,10 @@ const Profile = ({doctorData}) => {
             className='form__input'
             aria-readonly
             readOnly
-            disabled="true"
+            
             />
         </div>
-        <div className='mb-5'>
+        {/* <div className='mb-5'>
             <p className='form__label'>Password</p>
             <input 
             type="password"
@@ -206,12 +231,12 @@ const Profile = ({doctorData}) => {
             readOnly
             disabled="true"
             />
-        </div>
+        </div> */}
         <div className='mb-5'>
             <p className='form__label'>Phone*</p>
             <input 
             type="number"
-            name='pone'
+            name='phone'
             value={formData.phone}
             onChange={handleChange}
             placeholder='Phone Number'
@@ -281,8 +306,8 @@ const Profile = ({doctorData}) => {
                         <div>
                             <p className=' form__label '>Starting Date*</p>
                             <input type="date"
-                            name='startingData'
-                            value={item.startingData}
+                            name='startingDate'
+                            value={item.startingDate}
                             onChange={e =>handleQualificationChange(e,index)}
                             className=' form__input' />
                         </div>
@@ -336,8 +361,8 @@ const Profile = ({doctorData}) => {
                         <div>
                             <p className=' form__label '>Starting Date*</p>
                             <input type="date"
-                            name='startingData'
-                            value={item.startingData}
+                            name='startingDate'
+                            value={item.startingDate}
                             onChange={e=>handleExperienceChange(e,index)}
                             className=' form__input' />
                         </div>
@@ -471,7 +496,7 @@ const Profile = ({doctorData}) => {
         </div>
 
         <div className=' mt-7'>
-            <button type='submit' onClick={updateProfileHandler} className=' bg-primaryColor text-white text-[18px] leading-[30px] w-full py-3 rounded-lg '>Update Profile</button>
+            <button type='submit' onClick={updateProfileHandler} className=' bg-primaryColor text-white text-[18px] leading-[30px] w-full py-3 rounded-lg '>{loading?<HashLoader size={25}/> : 'Update Profile'}</button>
         </div>
 
 
