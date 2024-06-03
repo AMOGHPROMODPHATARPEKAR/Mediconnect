@@ -20,7 +20,7 @@ d="M12,0A12,12,0,1,0,24, 12, 12.014,12.014,0,0,0,12,0Zm6.927,8.2-6.845,9.289a1.0
             <p>Have a great day</p>
             <div className="py-10 text-center">
                 <Link to='/home'
-                className="px-12 bg-buttonBgColor text-white font-semibold py-3"
+                className="px-12 bg-buttonBgColor text-primaryColor font-semibold py-3"
                 >
                 Go back to Home</Link>
             </div>

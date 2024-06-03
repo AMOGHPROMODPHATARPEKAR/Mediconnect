@@ -202,12 +202,12 @@ export const getDoctorProfile =async (req,res)=>{
         const {password, ...rest} = doctor._doc;
 
         const appointements = await BookingSchema.find({doctor:doctorId})
-        
+        console.log(appointements)
         return res.status(200)
                 .json({
                     status:true,
                     message:"Successfully fetched doctor Profile",
-                    data:{...rest}
+                    data:{...rest,appointements:appointements}
                 })
         
     } catch (error) {

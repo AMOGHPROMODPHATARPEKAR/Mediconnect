@@ -5,24 +5,7 @@ import {NavLink, Link} from 'react-router-dom';
 import { authContext } from '../../context/AuthContext.jsx';
 
 
-const navLinks = [
-  {
-    path:'/home',
-    display:'Home'
-  },
-  {
-    path:'/doctors',
-    display:'Find a Doctor'
-  },
-  {
-    path:'/services',
-    display:'Services'
-  },
-  {
-    path:'/contact',
-    display:'Contact'
-  },
-]
+
 
 
 const Header = () => {
@@ -34,6 +17,46 @@ const Header = () => {
   const menuRef = useRef(null)
 
   const {user,role,token} = useContext(authContext);
+
+  let status;
+  if(role === 'patient')
+    {
+      status=true;
+    }else
+    {
+      status=false;
+    }
+
+    console.log(!status)
+
+  const navLinks = [
+    {
+      path:'/home',
+      display:'Home',
+      active:true
+    },
+    {
+      path:'/doctors',
+      display:'Find a Doctor',
+      active:status
+    },
+    {
+      path:'/services',
+      display:'Services',
+      active:true
+    },
+    {
+      path:'/contact',
+      display:'Contact',
+      active:true
+    },
+    {
+      path:"/verify",
+      display:'Verify If Not',
+      active:!status
+    }
+  ]
+
 
   const handleStickyHeader = ()=>{
     window.addEventListener('scroll',()=>{
@@ -68,7 +91,10 @@ const Header = () => {
       <div className='navigation' ref={menuRef} onClick={toggleMenu}>
         <ul className='menu flex items-center gap-[2.7rem]'>
         {
-          navLinks.map((link,index)=>(
+          navLinks.map((link,index)=>
+            link.active?
+            (
+
             <li key={index}>
               <NavLink to={link.path}
               className={navClass => navClass.isActive ? "text-primaryColor text-[16px] leading-7 font-[600] ":"text-textColor text-[16px] leading-7 font-[600] hover:text-primaryColor "}
@@ -76,7 +102,7 @@ const Header = () => {
                  {link.display}
               </NavLink>
             </li>
-          ))
+          ):null)
         }
         </ul>
       </div>

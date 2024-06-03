@@ -8,6 +8,7 @@ import starIcon from '../../assets/images/Star.png'
 import DoctorAbout from '../../pages/Doctors/DoctorAbout.jsx'
 import Profile from './Profile.jsx'
 import Appointments from './Appointments.jsx'
+import { Link } from 'react-router-dom'
 
 const Dashboard = () => {
 
@@ -43,8 +44,12 @@ const Dashboard = () => {
 
             <span className=' sr-only '>Info</span>
             <div className=' ml-3 text-sm font-medium '>
-              To get approval please complete your profile. we&apos;ll review manually and approve within 3 days.
+              To get approval please complete your profile. we&apos;ll review manually and approve within 3 days. 
+              <Link to='/verify'>
+            <span className=' text-primaryColor underline ml-1 '>Verify</span>
+            </Link>
             </div>
+            
 
             </div>) }
 
@@ -81,7 +86,7 @@ text-[12px] leading-4 lg:text-[16px] lg:leading-6 font-semibold">
                   </div>}
 
 
-                {tab === 'appointments' && <Appointments appointments={data?.appointments}/> 
+                {tab === 'appointments' && <Appointments appointments={data?.appointements}/> 
                 }
 
 

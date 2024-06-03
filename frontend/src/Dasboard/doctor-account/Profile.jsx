@@ -45,8 +45,8 @@ const Profile = ({doctorData}) => {
     const navigate = useNavigate()
     const handleChange = (e) =>{
         setFormData({...formData, [e.target.name]:e.target.value})
-        
       }
+
 
       const handleFileInput = async(e)=>{
         const file = e.target.files[0]
@@ -241,7 +241,7 @@ const Profile = ({doctorData}) => {
             onChange={handleChange}
             placeholder='Phone Number'
             className='form__input'
-            
+            maxLength={10}
             />
         </div>
         <div className=' mb-5'>
