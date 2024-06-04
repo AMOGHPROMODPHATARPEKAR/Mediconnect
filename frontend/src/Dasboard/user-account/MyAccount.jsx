@@ -6,6 +6,8 @@ import Profile from './Profile.jsx';
 import useFetchData from '../../hooks/useFetchData.jsx';
 import Loading from '../../components/Loader/Loading.jsx';
 import Error from '../../components/Error/Error.jsx';
+import { toast } from 'react-toastify';
+import { token } from '../../config.js';
 
 
 
@@ -24,6 +26,59 @@ const MyAccount = () => {
             type:'LOGOUT'
         });
     }
+
+    const handleDelete = () => {
+        toast(
+          ({ closeToast }) => (
+            <div className=' p-1 mt-3 '>
+              <p className=' text-black font-semibold text-[20px]   '>Are you sure you want to delete this account?</p>
+              <div className=' gap-3 flex items-center justify-around mt-2 text-[15px] font-[600] '>
+              <button onClick={() => confirmDelete(closeToast)}  >Yes</button>
+              <button onClick={closeToast}>No</button>
+              </div>
+              
+            </div>
+          ),
+          {
+            position: "top-center",
+            autoClose: false,
+          }
+        );
+      };
+    
+      const confirmDelete = async(closeToast) => {
+        // Perform the delete action here
+        
+        try {
+            // console.log(userData._id)
+            const res = await fetch(`/api/v1/user/${userData._id}`,{
+                method:'delete',
+                headers:{
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+                }
+            }) 
+
+            const result = await res.json();
+
+            if(!res.ok){
+                throw new Error(result.message)
+            }
+
+            closeToast();
+
+            dispatch({
+                type:'LOGOUT'
+            });
+
+        toast.success("Item deleted successfully!");
+        } catch (error) {
+
+            toast.error(error.message)
+        }
+
+        
+      };
 
   return (
     <section>
@@ -53,7 +108,7 @@ const MyAccount = () => {
 
                 <div className=' mt-[50px] md:mt-[100px] text-white '>
                     <button onClick={handleLogout} className=' w-full bg-[#181A1E] p-3 leading-7 text-[16px] rounded-md  '>Logout</button>
-                    <button className=' w-full bg-red-600 p-3 leading-7 text-[16px] rounded-md mt-4 '>Delete Account</button>
+                    <button onClick={handleDelete} className=' w-full bg-red-600 p-3 leading-7 text-[16px] rounded-md mt-4 '>Delete Account</button>
                 </div>
 
             </div>

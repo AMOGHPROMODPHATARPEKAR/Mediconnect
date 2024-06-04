@@ -1,6 +1,7 @@
 import User from "../models/UserSchema.js"
 import Booking from '../models/BookingSchema.js'
 import Doctor from '../models/DoctorSchema.js'
+import mongoose from "mongoose";
 
 export const updateUser = async(req,res)=>{
 
@@ -194,28 +195,62 @@ export const getMyAppointments = async(req,res)=>{
     try {
         
         //step1 :retrieve appointments from booking for specific user
-
-        const booking = await Booking.find({user:req.userId})
-
-        //step2 : extract doctor ids from appointement booking
-
-        const doctorIds = booking.map(el=>el.doctor.id);
-
-        //step3 :retrive doctors using doctorID
-        const doctors = await Doctor.find({_id:{$in:doctorIds}}).select("-password")
-
-        if(!doctors){
+        // console.log(req.userId)
+        const bookings = await Booking.aggregate([
+            {
+              $match: { user: new mongoose.Types.ObjectId(req.userId) }  // Match bookings for the specific user
+            },
+            {
+              $lookup: {
+                from: 'doctors',            // Name of the doctor collection
+                localField: 'doctor',     // Field in the Booking collection
+                foreignField: '_id',        // Field in the Doctor collection
+                as: 'doctorInfo'            // The name of the new array field to add
+              }
+            },
+            {
+              $unwind: '$doctorInfo'        // Unwind the array to de-normalize the result
+            },
+            {
+              $project: {                   // Select fields to include in the output
+                _id: 1,
+                user: 1,
+                doctorInfo: {
+                  _id: 1,
+                  email: 1,
+                  name: 1,
+                  photo: 1,
+                  role: 1,
+                  qualifications: 1,
+                  experiences: 1,
+                  timeSlots: 1,
+                  reviews: 1,
+                  averageRating: 1,
+                  totalRating: 1,
+                  isApproved: 1,
+                  appointments: 1,
+                  about: 1,
+                  bio: 1,
+                  phone: 1,
+                  specialization: 1,
+                  ticketPrice: 1
+                }
+              }
+            }
+          ]);
+          if(!bookings){
             return res.status(400)
-            .json({
-                success:false,
-                message:"No doctors found some error"
-            })
-        }
+                .json({
+                    success:false,
+                    message:"No booking found some error"
+                })
+          }
+
         return res.status(200)
         .json({
             success:true,
-            message:"Appointment doctor ",
-            data:doctors
+            message:"Appointments doctor ",
+            data:bookings
         })
 
 
@@ -223,7 +258,7 @@ export const getMyAppointments = async(req,res)=>{
         return res.status(500)
             .json({
                 success:false,
-                message:"No Appointment found some error"
+                message:error.message
             })
     }
 }

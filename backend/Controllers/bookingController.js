@@ -18,8 +18,8 @@ export const getCheckoutSession = async(req,res)=>{
        const session = await stripe.checkout.sessions.create({
         payment_method_types:['card'],
         mode:'payment',
-        success_url:`${process.env.CLIENT_SITE_URL}/checkout-success`,
-        cancel_url:`${req.protocol}://${req.get('host')}/doctor/${doctor._id}`,
+        success_url:`${process.env.CLIENT_SITE_URL}/checkout-success/${doctor._id}`,
+        cancel_url:`${process.env.CLIENT_SITE_URL}/checkout-reject`,
         customer_email:user.email,
         client_reference_id:req.params.doctorId,
         line_items:[
@@ -30,15 +30,6 @@ export const getCheckoutSession = async(req,res)=>{
         ]
        })
 
-       //create new booking 
-       const booking = new Booking({
-        doctor:doctor._id,
-        user:user._id,
-        ticketPrice:doctor.ticketPrice,
-        session:session.id
-       })
-
-       await booking.save();
 
        return res.status(200)
        .json({
@@ -58,4 +49,40 @@ export const getCheckoutSession = async(req,res)=>{
        })
     }
 
+}
+
+export const createBooking = async (req,res)=>{
+    //create new booking 
+    
+    try {
+
+        const doctor = await Doctor.findById(req.params.doctorId)
+        const user = await User.findById(req.userId)
+
+        const booking = new Booking({
+            doctor:doctor._id,
+            user:user._id,
+            ticketPrice:doctor.ticketPrice,
+            status:'approved'
+           })
+    
+           await booking.save();
+        
+           return res.status(200)
+           .json({
+            success:true,
+            message:"Successfully Booking done",
+            data:booking
+           })
+
+    } catch (error) {
+        console.log(error)
+
+       return res.status(500)
+       .json({
+        success:false,
+        message:"Error creating booking",
+       
+       })
+    }
 }

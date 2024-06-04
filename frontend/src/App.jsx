@@ -1,12 +1,17 @@
 import "./App.css";
 import Layout from "./layout/Layout";
-
+import { ToastContainer } from "react-toastify";
 
 
 function App() {
 
 
-  return  <Layout/>
+  return(  
+  <div>
+    <ToastContainer/>
+ <Layout/>
+  </div>
+ )
       
 
 }

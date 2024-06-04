@@ -1,7 +1,40 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+import React, { useEffect } from 'react'
+import { Link, useNavigate, useParams } from 'react-router-dom'
+import { toast } from 'react-toastify';
+import { token } from '../../config.js';
 
 const CheckoutSuccess = () => {
+
+  const {doctorId} = useParams();
+  const navigate = useNavigate()
+    const booking = async()=>{
+      
+      try {
+        const res = await fetch(`/api/v1/bookings/create/${doctorId}`,{
+  
+          method:'post',
+          headers:{
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        });
+  
+        const result = await res.json();
+  
+        if(!res.ok){
+          throw new Error(result.message)
+        }
+
+        toast.success(result.message)
+        navigate('/home')
+
+      } catch (error) {
+        
+        toast.error(error.message)
+      }
+
+    }
+
   return (
     <div className="bg-gray-100 h-screen">
         <div className="bg-white p-6 md:mx-auto">
@@ -19,10 +52,8 @@ d="M12,0A12,12,0,1,0,24, 12, 12.014,12.014,0,0,0,12,0Zm6.927,8.2-6.845,9.289a1.0
             <p className="text-gray-600 my-2">Thankyou for completing your secure online payment.</p>
             <p>Have a great day</p>
             <div className="py-10 text-center">
-                <Link to='/home'
-                className="px-12 bg-buttonBgColor text-primaryColor font-semibold py-3"
-                >
-                Go back to Home</Link>
+                
+            <button onClick={booking} className='btn' >Confirm Booking and Go back to home</button>
             </div>
         </div>
 

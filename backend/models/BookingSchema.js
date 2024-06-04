@@ -1,4 +1,6 @@
 import mongoose from "mongoose";
+import DoctorSchema from "./DoctorSchema.js";
+import UserSchema from "./UserSchema.js";
 
 const bookingSchema = new mongoose.Schema(
   {
@@ -12,6 +14,7 @@ const bookingSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+
     ticketPrice: { type: String, required: true },
     
     
@@ -23,7 +26,7 @@ const bookingSchema = new mongoose.Schema(
     isPaid: {
       type: Boolean,
       default: true,
-    },
+    }
   },
   { timestamps: true }
 );
@@ -35,6 +38,28 @@ bookingSchema.pre(/^find/,function(next){
  })
 
  next();
+})
+
+bookingSchema.statics.updateAppointments = async function(Booking){
+  await DoctorSchema.findByIdAndUpdate(
+    Booking.doctor,
+    {
+      $push:{"appointments":Booking._id}
+    }
+  );
+
+
+  await UserSchema.findByIdAndUpdate(
+    Booking.user,
+    {
+      $push:{"appointments":Booking._id}
+    }
+  )
+
+}
+
+bookingSchema.post("save",function(){
+  this.constructor.updateAppointments(this);
 })
 
 export default mongoose.model("Booking", bookingSchema);

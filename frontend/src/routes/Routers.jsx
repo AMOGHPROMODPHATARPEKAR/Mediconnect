@@ -12,6 +12,7 @@ import Dashboard from '../Dasboard/doctor-account/Dashboard.jsx'
 import {Routes, Route} from 'react-router-dom'
 import ProtectedRoute from './ProtectedRoute.jsx'
 import CheckoutSuccess from '../pages/Doctors/CheckoutSuccess.jsx'
+import CheckoutReject from '../pages/Doctors/CheckoutReject.jsx'
 import Verify from '../pages/Verify.jsx'
 
 
@@ -25,7 +26,8 @@ const Routers = () => {
     <Route  path='/register' element={<Signup/>} />
     <Route  path='/contact' element={<Contact/>} />
     <Route  path='/services' element={<Services/>} />
-    <Route  path='/checkout-success' element={<CheckoutSuccess/>} />
+    <Route  path='/checkout-success/:doctorId' element={<CheckoutSuccess/>} />
+    <Route  path='/checkout-reject' element={<CheckoutReject/>} />
     <Route  path='/verify' element={<Verify/>} />
     <Route path='/user/profile/me' element={<ProtectedRoute allowedRoles={['patient']}><MyAccount/></ProtectedRoute> }/>
     <Route path='/doctor/profile/me' element={ <ProtectedRoute allowedRoles={['doctor']}><Dashboard/></ProtectedRoute>}/>
