@@ -86,3 +86,37 @@ export const createBooking = async (req,res)=>{
        })
     }
 }
+
+export const deleteBooking = async(req,res)=>{
+
+    const {bookingId} = req.params;
+   
+    try {
+        
+        const booking = await Booking.findById(bookingId);
+        if (!booking) {
+        throw new Error('Booking not found');
+        }
+
+    // Remove the booking from the doctor's and user's appointments
+    await Booking.removeAppointments(booking);
+
+    // Delete the booking
+    const deleted = await Booking.findByIdAndDelete(bookingId);
+    
+    return res.status(200)
+    .json({
+        success:true,
+        message:"Deleted Booking successfully",
+        data:deleted
+    })
+
+    } catch (error) {
+        return res.status(500)
+        .json({
+            success:false,
+            message:error.message
+        })
+    }
+
+}

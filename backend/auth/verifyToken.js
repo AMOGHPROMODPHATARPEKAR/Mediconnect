@@ -46,7 +46,7 @@ export const authenicate = async(req,res,next)=>{
 
 export const restrict = roles => async(req,res,next)=>{
 
-    
+    console.log("role",req.role,roles)
     
     if(!roles.includes(req.role)){
         return res

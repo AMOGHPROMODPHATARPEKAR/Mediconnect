@@ -58,8 +58,26 @@ bookingSchema.statics.updateAppointments = async function(Booking){
 
 }
 
+// Static method to remove appointments when booking is deleted
+bookingSchema.statics.removeAppointments = async function (booking) {
+  await DoctorSchema.findByIdAndUpdate(
+    booking.doctor,
+    { $pull: { appointments: booking._id } }
+  );
+
+  await UserSchema.findByIdAndUpdate(
+    booking.user,
+    { $pull: { appointments: booking._id } }
+  );
+};
+
 bookingSchema.post("save",function(){
   this.constructor.updateAppointments(this);
 })
+
+// Middleware to remove appointments when booking is deleted
+bookingSchema.pre('remove', function (next) {
+  this.constructor.removeAppointments(this).then(() => next());
+});
 
 export default mongoose.model("Booking", bookingSchema);

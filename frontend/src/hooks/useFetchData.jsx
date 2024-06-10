@@ -9,8 +9,7 @@ const useFetchData = (url) => {
 
     const {token} = useContext(authContext)
     
-    
-    useEffect(()=>{
+    useEffect( ()=>{
         const fetchData = async()=>{
             try {
                 setLoading(true)
@@ -28,8 +27,9 @@ const useFetchData = (url) => {
                     throw new Error(result.message+'🤢')
                 }
                 
-
+                console.log("res",result)
                 setData(result.data)
+                
 
             } catch (error) {
                 setError(error.message)

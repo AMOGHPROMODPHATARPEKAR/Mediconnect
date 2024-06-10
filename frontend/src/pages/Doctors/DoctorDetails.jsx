@@ -14,11 +14,11 @@ import { useParams } from 'react-router-dom'
 const DoctorDetails = () => {
 
   const [tab,setTab] = useState('about')
-
+  
   const {id} = useParams()
-
+  console.log(id)
   const {data:doctor,loading, error} = useFetchData(`${BASE_URL}/doctor/${id}`)
-
+  console.log(doctor)
   const {name
     ,specialization,
     averageRating,
@@ -53,7 +53,7 @@ leading-4 lg:text-[16px] lg:leading-7 font-semibold rounded">{name}</h3>
               <div className="flex items-center gap-[6px]">
                 <span className="flex items-center gap-[6px] text-[14px] leading-5 lg:text-[16px]
 lg:leading-7 font-semibold text-headingColor">
-                  <img src={starIcon} alt="" /> {averageRating}
+                  <img src={starIcon} alt="" /> {averageRating?.toFixed(2)}
                 </span>
                 <span className="text-[14px] leading-5 lg:text-[16px] lg:leading-7 font-[400]
 text-textColor">({totalRating})</span>

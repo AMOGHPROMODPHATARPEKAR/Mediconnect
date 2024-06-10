@@ -10,7 +10,7 @@ import {token} from '../../config.js'
 
 const Profile = ({user}) => {
 
-  
+  console.log(token)
   const [loading,setLoading] = useState(false)
  
   const navigate = useNavigate();
@@ -20,7 +20,6 @@ const Profile = ({user}) => {
   const [formData,setFormData] = useState({
     name:'',
     email:'',
-    password:'',
     photo:null,
     gender:'male',
     bloodType:''
@@ -81,6 +80,7 @@ console.log(data)
     } catch (error) {
       
       toast.error(error.message)
+      console.log(error)
 
     }finally{
       setLoading(false)
@@ -109,16 +109,8 @@ console.log(data)
             
             />
             </div>
-          <div className=' mb-5'>
-            <input type="password"
-             placeholder='Password' 
-             value={formData.password}
-            onChange={handleChange}
-            name='password' 
-            className="w-full px-4 py-3 border-b border-solid border-[#0066ff61] focus:outline-none focus:border-b-primaryColor text-[16px] leading-7 text-headingColor placeholder:text-textColor cursor-pointer"
-           
-            />
-          </div>
+
+          
 
           <div className=' mb-5'>
             <input type="text"

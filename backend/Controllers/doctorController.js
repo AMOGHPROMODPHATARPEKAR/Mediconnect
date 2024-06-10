@@ -1,5 +1,6 @@
 import BookingSchema from "../models/BookingSchema.js";
 import Doctor from "../models/DoctorSchema.js"
+import VerifySchema from "../models/VerifySchema.js";
 
 
 export const updateDoctor = async(req,res)=>{
@@ -56,7 +57,7 @@ export const updateDoctor = async(req,res)=>{
 export const getDoctor = async(req,res)=>{
 
     const id =  req.params.id;
-
+    console.log(id)
     try {
 
         const doctor = await Doctor.findById(
@@ -218,5 +219,55 @@ export const getDoctorProfile =async (req,res)=>{
                     message:"Error in fetcing doctor"
                 })
         
+    }
+}
+
+export const CreatVerify = async(req,res)=>{
+
+    const {qualifications,experiences,name,specialization} = req.body;
+    const doctorId = req.userId;
+
+    try {
+        
+        const verification = new VerifySchema({
+            name,
+            doctor:doctorId,
+            specialization,
+            qualifications,
+            experiences
+        })
+
+        await verification.save()
+
+        const updateDoctor = await Doctor.findByIdAndUpdate(
+            doctorId,
+            {$set:{
+                isApproved:"processing"
+            }},
+            {new:true}
+        )
+
+        if(!updateDoctor){
+          return  res.status(400)
+             .json({
+                succcess:false,
+                message:"Doctor updating  error",
+             })
+        }
+
+       return res.status(200)
+             .json({
+                succcess:false,
+                message:"Verification in processing !!",
+                data:verification
+             })
+
+        
+    } catch (error) {
+        return res.status(500)
+        .json({
+            success:false,
+            message:"Error in creating verification"
+        })
     }
 }
