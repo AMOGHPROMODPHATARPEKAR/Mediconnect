@@ -23,6 +23,11 @@ const bookingSchema = new mongoose.Schema(
       enum: ["pending", "approved", "cancelled"],
       default: "pending",
     },
+    date:{
+      type:String,
+      required:true
+      
+    },
     isPaid: {
       type: Boolean,
       default: true,
@@ -39,6 +44,7 @@ bookingSchema.pre(/^find/,function(next){
 
  next();
 })
+
 
 bookingSchema.statics.updateAppointments = async function(Booking){
   await DoctorSchema.findByIdAndUpdate(

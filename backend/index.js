@@ -8,7 +8,7 @@ import userRoute from './Routes/user.js'
 import doctorRoute from './Routes/doctor.js'
 import reviewRoute from './Routes/review.js'
 import bookingRoute from './Routes/booking.js'
-
+import { Resend } from 'resend';
 
 const app = express();
 const PORT = process.env.PORT || 8000; 
@@ -31,6 +31,7 @@ app.use(express.json({
 app.use(express.urlencoded({extended:true,limit:"16kb"}))
 app.use(cookieParser())
 
+export const resend = new Resend(process.env.RESEND_KEY);
 
 //database
 

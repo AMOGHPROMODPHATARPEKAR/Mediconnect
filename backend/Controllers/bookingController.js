@@ -58,16 +58,17 @@ export const createBooking = async (req,res)=>{
 
         const doctor = await Doctor.findById(req.params.doctorId)
         const user = await User.findById(req.userId)
-
+        const {date} = req.body
         const booking = new Booking({
             doctor:doctor._id,
             user:user._id,
             ticketPrice:doctor.ticketPrice,
-            status:'approved'
+            status:'approved',
+            date:date
            })
     
-           await booking.save();
-        
+         await booking.save();
+         await booking.populate('user doctor')
            return res.status(200)
            .json({
             success:true,

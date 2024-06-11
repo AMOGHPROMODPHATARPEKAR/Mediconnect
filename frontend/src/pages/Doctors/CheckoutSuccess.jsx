@@ -1,7 +1,8 @@
 import React, { useEffect } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'react-toastify';
-import { token } from '../../config.js';
+import { BASE_URL, token } from '../../config.js';
+
 
 const CheckoutSuccess = () => {
 
@@ -16,15 +17,32 @@ const CheckoutSuccess = () => {
           headers:{
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
-          }
+          },
+          body:JSON.stringify({date:"14-06-2024"})
         });
-  
         const result = await res.json();
+        // console.log("booking",result)
   
         if(!res.ok){
           throw new Error(result.message)
         }
 
+        const emailResponse = await fetch(`${BASE_URL}/bookings/sendEmail`,{
+          method:'post',
+          headers:{
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body:JSON.stringify({ email: result?.data?.user?.email,username: result?.data?.user?.name,date:result?.data?.date,doctorName: result?.data?.doctor?.name })
+          }
+        );
+        const emailRes = await emailResponse.json();
+        if(!emailResponse.ok)
+          {
+              throw new Error(emailRes.message)
+          }
+        
+          toast.success(emailRes.message)
         toast.success(result.message)
         navigate('/home')
 
