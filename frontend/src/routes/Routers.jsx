@@ -14,6 +14,8 @@ import ProtectedRoute from './ProtectedRoute.jsx'
 import CheckoutSuccess from '../pages/Doctors/CheckoutSuccess.jsx'
 import CheckoutReject from '../pages/Doctors/CheckoutReject.jsx'
 import Verify from '../pages/Verify.jsx'
+import Chat from '../pages/Chat.jsx'
+import DoctorChat from '../pages/Doctors/DoctorChat.jsx'
 
 
 const Routers = () => {
@@ -29,6 +31,8 @@ const Routers = () => {
     <Route  path='/checkout-success/:doctorId' element={<CheckoutSuccess/>} />
     <Route  path='/checkout-reject' element={<CheckoutReject/>} />
     <Route  path='/verify' element={<Verify/>} />
+    <Route  path='/chats' element={<DoctorChat/>} />
+    <Route  path='/chat/:id' element={<Chat/>} />
     <Route path='/user/profile/me' element={<ProtectedRoute allowedRoles={['patient']}><MyAccount/></ProtectedRoute> }/>
     <Route path='/doctor/profile/me' element={ <ProtectedRoute allowedRoles={['doctor']}><Dashboard/></ProtectedRoute>}/>
   </Routes>

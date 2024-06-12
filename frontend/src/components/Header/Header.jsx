@@ -54,6 +54,11 @@ const Header = () => {
       path:"/verify",
       display:'Verify If Not',
       active:!status
+    },
+    {
+      path:"/chats",
+      display:'Chats',
+      active:!status
     }
   ]
 
