@@ -1,13 +1,14 @@
-import React from 'react'
+import React, { useState } from 'react'
 import convertTime from '../../utils/convertTime'
 import {BASE_URL, token } from '../../config'
 import { toast } from 'react-toastify'
 
 const SlidePanel = ({doctorId,timeSlots,ticketPrice}) => {
-
+    const [time,setTime] = useState('')
     const bookingHandler = async()=>{
+         
         try {
-            const res = await fetch(`${BASE_URL}/bookings/checkout-session/${doctorId}`,{
+            const res = await fetch(`${BASE_URL}/bookings/checkout-session/${doctorId}/${time}`,{
                 method:'post',
                 headers:{
                     Authorization:`Bearer ${token}`
@@ -44,14 +45,15 @@ const SlidePanel = ({doctorId,timeSlots,ticketPrice}) => {
 
             {timeSlots?.map((item,index)=>(
                 <li className="flex items-center justify-between mb-2">
-                    <p className="text-[15px] leading-6 text-textColor font-semibold">{item.day.charAt(0).toUpperCase() + item.day.slice(1)}</p>
+                    <p className="text-[15px] leading-6 text-textColor font-semibold">{item.day}</p>
                     <p className="text-[15px] leading-6 text-textColor font-semibold"> {convertTime(item.startingTime)} - {convertTime(item.endingTime)}</p>
+                    <input type="radio" value={item.day} name='time' onChange={(e)=>setTime(e.target.value)} />
                 </li>
             ))}
 
             </ul>
         </div>
-        <button onClick={bookingHandler} className=' btn px-2 w-full rounded-md '>Book Appointment</button>
+        <button onClick={bookingHandler} className=' btn px-2 w-full rounded-md ' disabled={time === ''} >Book Appointment</button>
 
     </div>
   )

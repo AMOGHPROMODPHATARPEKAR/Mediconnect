@@ -9,7 +9,7 @@ export const getCheckoutSession = async(req,res)=>{
         
        const doctor = await Doctor.findById(req.params.doctorId)
        const user = await User.findById(req.userId)
-       
+       const time = req.params.time
        
        const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
         const priceId = process.env.STRIPE_PRICE_ID
@@ -18,7 +18,7 @@ export const getCheckoutSession = async(req,res)=>{
        const session = await stripe.checkout.sessions.create({
         payment_method_types:['card'],
         mode:'payment',
-        success_url:`${process.env.CLIENT_SITE_URL}/checkout-success/${doctor._id}`,
+        success_url:`${process.env.CLIENT_SITE_URL}/checkout-success/${doctor._id}/${time}`,
         cancel_url:`${process.env.CLIENT_SITE_URL}/checkout-reject`,
         customer_email:user.email,
         client_reference_id:req.params.doctorId,

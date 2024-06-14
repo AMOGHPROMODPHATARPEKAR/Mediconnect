@@ -5,7 +5,7 @@ import sendAppointmentEmail from '../Controllers/emailContoller.js';
 
 const router = express.Router();
 
-router.post('/checkout-session/:doctorId',authenicate, getCheckoutSession)
+router.post('/checkout-session/:doctorId/:time',authenicate, getCheckoutSession)
 router.post('/create/:doctorId',authenicate,createBooking)
 router.delete('/:bookingId',authenicate,deleteBooking);
 router.post('/sendEmail',authenicate,sendAppointmentEmail)

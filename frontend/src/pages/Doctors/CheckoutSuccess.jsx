@@ -6,7 +6,7 @@ import { BASE_URL, token } from '../../config.js';
 
 const CheckoutSuccess = () => {
 
-  const {doctorId} = useParams();
+  const {doctorId,time} = useParams();
   const navigate = useNavigate()
     const booking = async()=>{
       
@@ -18,7 +18,7 @@ const CheckoutSuccess = () => {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
           },
-          body:JSON.stringify({date:"14-06-2024"})
+          body:JSON.stringify({date:time})
         });
         const result = await res.json();
         // console.log("booking",result)
@@ -33,7 +33,7 @@ const CheckoutSuccess = () => {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
           },
-          body:JSON.stringify({ email: result?.data?.user?.email,username: result?.data?.user?.name,date:result?.data?.date,doctorName: result?.data?.doctor?.name })
+          body:JSON.stringify({ email: result?.data?.user?.email,username: result?.data?.user?.name,date:time,doctorName: result?.data?.doctor?.name })
           }
         );
         const emailRes = await emailResponse.json();

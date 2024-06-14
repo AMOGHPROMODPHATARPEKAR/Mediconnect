@@ -11,6 +11,7 @@ const Profile = ({doctorData}) => {
     const [formData, setFormData] = useState({
         name:'',
         email:'',
+        location:'',
         phone:0,
         bio:'',
         gender:'',
@@ -23,11 +24,18 @@ const Profile = ({doctorData}) => {
         photo:null
 
     });
+    const today = new Date();
+    const todayString = today.toISOString().split('T')[0]; // Get YYYY-MM-DD format
+
+    const oneWeekFromToday = new Date();
+    oneWeekFromToday.setDate(today.getDate() + 20);
+    const oneWeekFromTodayString = oneWeekFromToday.toISOString().split('T')[0];
 
     useEffect(()=>{
         setFormData({
             name:doctorData?.name,
             email:doctorData?.email,
+            location:doctorData?.location,
             phone:doctorData?.phone,
             bio:doctorData?.bio,
             gender:doctorData?.bio,
@@ -218,20 +226,18 @@ const Profile = ({doctorData}) => {
             
             />
         </div>
-        {/* <div className='mb-5'>
-            <p className='form__label'>Password</p>
+        <div className='mb-5'>
+            <p className='form__label'>Location</p>
             <input 
-            type="password"
-            name='password'
-            value={formData.password}
+            type="text"
+            name='location'
+            value={formData.location}
             onChange={handleChange}
-            placeholder='Password'
+            placeholder='Location'
             className='form__input'
-            aria-readonly
-            readOnly
-            disabled="true"
+            
             />
-        </div> */}
+        </div>
         <div className='mb-5'>
             <p className='form__label'>Phone*</p>
             <input 
@@ -415,19 +421,13 @@ const Profile = ({doctorData}) => {
                         <div className=' grid grid-cols-2 md:grid-cols-4 mb-[30px] gap-5 '>
                         <div>
                             <p className=' form__label '>Day*</p>
-                            <select name="day" value={item.day} 
-                            className=' form__input py-3.5'
-                            onChange={e=> handleTimeSlotChange(e,index)}
-                            >
-                                <option value="">Select</option>
-                                <option value="sunday">Sunday</option>
-                                <option value="monday">Monday</option>
-                                <option value="tuesday">Tuesday</option>
-                                <option value="wednesday">Wednesday</option>
-                                <option value="thursday">Thursday</option>
-                                <option value="friday">Friday</option>
-                                <option value="saturday">Saturday</option>
-                            </select>
+                            <input type="date"
+                            name='day'
+                            value={item.day}
+                            onChange={e =>handleTimeSlotChange(e,index)}
+                            min={ todayString}
+                            max={oneWeekFromTodayString}
+                            className=' form__input' />
                         </div>
                         <div>
                             <p className=' form__label '>Starting Time*</p>

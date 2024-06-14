@@ -141,7 +141,8 @@ export const getAllDoctors = async(req,res)=>{
                 doctors = await Doctor.find({isApproved:'approved',
                  $or:[
                     {name:{$regex:query, $options:"i"}},
-                    {specialization:{$regex:query, $options:"i"}}
+                    {specialization:{$regex:query, $options:"i"}},
+                    {location:{$regex:query, $options:"i"}},
                  ]})
             }
             else

@@ -215,26 +215,7 @@ export const getMyAppointments = async(req,res)=>{
               $project: {                   // Select fields to include in the output
                 _id: 1,
                 user: 1,
-                doctorInfo: {
-                  _id: 1,
-                  email: 1,
-                  name: 1,
-                  photo: 1,
-                  role: 1,
-                  qualifications: 1,
-                  experiences: 1,
-                  timeSlots: 1,
-                  reviews: 1,
-                  averageRating: 1,
-                  totalRating: 1,
-                  isApproved: 1,
-                  appointments: 1,
-                  about: 1,
-                  bio: 1,
-                  phone: 1,
-                  specialization: 1,
-                  ticketPrice: 1
-                }
+                doctorInfo: 1
               }
             }
           ]);
