@@ -1,15 +1,17 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'react-toastify';
 import { BASE_URL, token } from '../../config.js';
+import HashLoader from 'react-spinners/HashLoader.js';
 
 
 const CheckoutSuccess = () => {
 
   const {doctorId,time} = useParams();
+  const [loader,setLoader] = useState(false)
   const navigate = useNavigate()
     const booking = async()=>{
-      
+      setLoader(true)
       try {
         const res = await fetch(`/api/v1/bookings/create/${doctorId}`,{
   
@@ -21,7 +23,7 @@ const CheckoutSuccess = () => {
           body:JSON.stringify({date:time})
         });
         const result = await res.json();
-        // console.log("booking",result)
+        
   
         if(!res.ok){
           throw new Error(result.message)
@@ -50,6 +52,9 @@ const CheckoutSuccess = () => {
         
         toast.error(error.message)
       }
+      finally{
+        setLoader(false)
+      }
 
     }
 
@@ -71,7 +76,7 @@ d="M12,0A12,12,0,1,0,24, 12, 12.014,12.014,0,0,0,12,0Zm6.927,8.2-6.845,9.289a1.0
             <p>Have a great day</p>
             <div className="py-10 text-center">
                 
-            <button onClick={booking} className='btn' >Confirm Booking and Go back to home</button>
+            <button onClick={booking} className='btn' >{loader?<HashLoader color='#0067FF' />:'Confirm Booking and Go back to home'}</button>
             </div>
         </div>
 

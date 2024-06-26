@@ -30,15 +30,17 @@ location} = doctor;
                 }     
              })
         
-             const {message} = await res.json();
+             const result = await res.json();
         
              if(!res.ok)
                  {
-                  throw new Error(message)
+                  throw new Error(result.message)
                  }
              
-                 toast.success(message)
-                  navigate('/home')
+                
+                toast.success(result.message)
+                toast.success("Booking delete email sent")
+                navigate('/home')
         
         } catch (error) {
             toast.error(error.message)

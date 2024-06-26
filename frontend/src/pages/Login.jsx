@@ -94,6 +94,7 @@ const Login = () => {
           </div>
 
           <p className=' mt-5 text-center text-textColor'> Don&apos;t have an account? <Link to='/register' className=' text-primaryColor font-medium ml-1 '>Register</Link></p>
+          <p className=' mt-5 text-center text-textColor'> Forgot Password? <Link to='/forgot' className=' text-primaryColor font-medium ml-1 '>Forgot</Link></p>
 
         </form>
       </div>

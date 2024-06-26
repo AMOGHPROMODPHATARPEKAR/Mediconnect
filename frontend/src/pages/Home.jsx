@@ -11,6 +11,7 @@ import avatarIcon from '../assets/images/avatar-icon.png'
 import faqImg from '../assets/images/faq-img.png'
 import {Link} from 'react-router-dom'
 import {BsArrowRight} from 'react-icons/bs'
+import {BsChatFill} from 'react-icons/bs'
 import About from '../components/About/About'
 import ServiceList from '../components/Services/ServiceList'
 import DoctorList from '../components/Doctors/DoctorList'
@@ -26,13 +27,16 @@ const Home = () => {
   <>
     {/* hero section start */}
     <section className=' hero_section pt-[60px] 2xl:h-[800px] '>
+      <Link to='/chatbot'>
+    <BsChatFill className=' fixed right-[50px] bottom-[30px] cursor-pointer' size={60} fill='green'  />
+      </Link>
     <div className=' container'>
       <div className=' flex flex-col lg:flex-row gap-[90px] items-center justify-between ' >
 
       <div>
         <div className=' lg:w-[570px]'>
           <h1 className=' text-[36px] leading-[46px] text-headingColor font-[800] md:text-[60px] md:leading-[70px] '>We help patients live a healty, longer lofe.</h1>
-          <p className=' text_para'>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quo ea, inventore ducimus quod laudantium provident at unde commodi vel id, sunt placeat velit blanditiis animi mollitia repellat voluptatum error nobis.</p>
+          <p className=' text_para'>Welcome to our cutting-edge Doctor Appointment Booking System! Our platform revolutionizes the way you schedule medical appointments, providing a seamless and efficient experience for both patients and healthcare providers.</p>
 
           <Link to='/doctors'>
           <button className='btn' na >Request an Appointment</button>

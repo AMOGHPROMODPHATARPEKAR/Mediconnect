@@ -2,6 +2,7 @@ import User from "../models/UserSchema.js"
 import Booking from '../models/BookingSchema.js'
 import Doctor from '../models/DoctorSchema.js'
 import mongoose from "mongoose";
+import bcrypt from 'bcryptjs'
 
 export const updateUser = async(req,res)=>{
 
@@ -242,4 +243,58 @@ export const getMyAppointments = async(req,res)=>{
                 message:error.message
             })
     }
+}
+
+export const emailExist = async (req,res)=>{
+    const {email} =  req.body;
+    
+    try {
+
+        const user = await User.findOne({email})
+
+        if(!user)
+            {
+                return res.status(400)
+                .json({
+                    status:false,
+                    message:"User not available",
+                    
+                })
+            }
+        return res.status(200)
+                .json({
+                    status:true,
+                    message:"Successfully fetched User Profile",
+                    data:user
+                })
+        
+    } catch (error) {
+
+        return res.status(500)
+                .json({
+                    status:false,
+                    message:"Error in fetcing User"
+                })
+        
+    }
+}
+
+export const changePassword = async(req,res)=>{
+    const {id} = req.params;
+    const { password } = req.body;
+    console.log(id,password)
+  if (!password) {
+    return res.status(400).json({ message: 'Password is required' });
+  }
+
+  try {
+    const hashedPassword = await bcrypt.hash(password, 12);
+     
+    await User.findByIdAndUpdate(id, { password: hashedPassword });
+
+    res.status(200).json({success:true, message: 'Password changed successfully' });
+  } catch (error) {
+    console.error('Error changing password', error);
+    res.status(500).json({success:false, message: 'Server error' });
+  }
 }

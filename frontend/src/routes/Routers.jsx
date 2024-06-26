@@ -16,6 +16,9 @@ import CheckoutReject from '../pages/Doctors/CheckoutReject.jsx'
 import Verify from '../pages/Verify.jsx'
 import Chat from '../pages/Chat.jsx'
 import DoctorChat from '../pages/Doctors/DoctorChat.jsx'
+import ChatBot from '../pages/ChatBot.jsx'
+import ForgetPassword from '../components/ForgetPassword.jsx'
+import ChangePassword from '../components/ChangePassword.jsx'
 
 
 const Routers = () => {
@@ -33,6 +36,9 @@ const Routers = () => {
     <Route  path='/verify' element={<Verify/>} />
     <Route  path='/chats' element={<DoctorChat/>} />
     <Route  path='/chat/:id' element={<Chat/>} />
+    <Route  path='/chatbot' element={<ChatBot/>} />
+    <Route  path='/forgot' element={<ForgetPassword/>} />
+    <Route  path='/changePassword/:id' element={<ChangePassword/>} />
     <Route path='/user/profile/me' element={<ProtectedRoute allowedRoles={['patient']}><MyAccount/></ProtectedRoute> }/>
     <Route path='/doctor/profile/me' element={ <ProtectedRoute allowedRoles={['doctor']}><Dashboard/></ProtectedRoute>}/>
   </Routes>

@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import DoctorSchema from "./DoctorSchema.js";
 import UserSchema from "./UserSchema.js";
+import { deleteAppointmentEmail } from '../Controllers/emailContoller.js';
 
 const bookingSchema = new mongoose.Schema(
   {
@@ -31,10 +32,16 @@ const bookingSchema = new mongoose.Schema(
     isPaid: {
       type: Boolean,
       default: true,
-    }
+    },
+    expiresAt: {
+      type: Date,
+      required: true
+  }
   },
   { timestamps: true }
 );
+
+bookingSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
 bookingSchema.pre(/^find/,function(next){
  this.populate('user').populate({
@@ -75,6 +82,14 @@ bookingSchema.statics.removeAppointments = async function (booking) {
     booking.user,
     { $pull: { appointments: booking._id } }
   );
+
+  await deleteAppointmentEmail({
+    email: booking.user.email,
+    username: booking.user.name,
+    doctorName: booking.doctor.name,
+    date: booking.date,
+  });
+
 };
 
 bookingSchema.post("save",function(){
