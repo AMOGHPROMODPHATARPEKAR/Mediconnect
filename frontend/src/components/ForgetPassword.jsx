@@ -2,9 +2,8 @@ import React, { useContext, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import HashLoader from 'react-spinners/HashLoader';
 import ClipLoader from "react-spinners/ClipLoader";
-import { authContext } from '../context/AuthContext';
 import { toast } from 'react-toastify';
-import { sendVerificationEmail } from '../helper/SendEmailVerification';
+
 
 
 

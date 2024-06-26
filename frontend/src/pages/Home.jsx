@@ -27,9 +27,12 @@ const Home = () => {
   <>
     {/* hero section start */}
     <section className=' hero_section pt-[60px] 2xl:h-[800px] '>
-      <Link to='/chatbot'>
-    <BsChatFill className=' fixed right-[50px] bottom-[30px] cursor-pointer' size={60} fill='green'  />
+     <div className='fixed right-[50px] bottom-[30px]'>
+     <Link to='/chatbot'>
+    <BsChatFill className='  cursor-pointer' size={70} fill='green'  />
       </Link>
+      <p className=' relative right-[-2px] bottom-[48px] text-white cursor-pointer'>Chatbot</p>
+     </div>
     <div className=' container'>
       <div className=' flex flex-col lg:flex-row gap-[90px] items-center justify-between ' >
 

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Box, Button, Container, TextField, Typography, Paper, List, ListItem, ListItemText } from '@mui/material';
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
+import { useEffect } from 'react';
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 // console.log(GEMINI_API_KEY)
 
@@ -25,8 +26,8 @@ const ChatBot = () => {
   const [newMessage, setNewMessage] = useState('');
   const [chat, setChat] = useState(null);
 
-  
-  React.useEffect(() => {
+  // Initialize chat and send initial message when the component mounts
+  useEffect(() => {
     const initChat = async () => {
       const genAI = new GoogleGenerativeAI(API_KEY);
       const model = genAI.getGenerativeModel({ model: MODEL_NAME });
@@ -38,10 +39,18 @@ const ChatBot = () => {
       });
 
       setChat(newChat);
+
+      // Send initial query to the bot without displaying its reply
+      try {
+        const initialQuery = "your name is MediConnectBot you only anwser medical,hospital,diseases and related queries. Whether you need information on symptoms, treatments, or healthcare facilities, just asks. Make sure When asked to suggest doctor give the Different type of Doctors like surgeon, physician,general based on the disease given do not give the doctor name";
+        await newChat.sendMessage(initialQuery);
+      } catch (error) {
+        console.error('Error sending initial query:', error.message);
+      }
     };
 
     initChat();
-  }, []);
+  }, []); // Empty dependency array ensures this effect runs only once
 
   const handleSendMessage = async () => {
     if (newMessage.trim() && chat) {
@@ -69,7 +78,7 @@ const ChatBot = () => {
       <Typography variant="h4" gutterBottom>
         MediConnectBot
       </Typography>
-      <Paper sx={{ height: '400px', overflowY: 'auto', padding: '10px', backgroundColor: 'rgba(255, 182, 193, 0.3)' }}>
+      <Paper sx={{ height: '400px', overflowY: 'auto', padding: '10px', backgroundColor: 'rgba(173, 216, 230, 0.3)' }}>
         <List>
           {messages.map((message, index) => (
             <ListItem
