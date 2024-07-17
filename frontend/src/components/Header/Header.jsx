@@ -15,8 +15,15 @@ const Header = () => {
 
   const headerRef = useRef(null)
   const menuRef = useRef(null)
+  const {dispatch} = useContext(authContext);
 
   const {user,role,token} = useContext(authContext);
+
+  const handleLogout =()=>{
+    dispatch({
+        type:'LOGOUT'
+    });
+}
 
   let status;
   if(role === 'patient')
@@ -60,6 +67,7 @@ const Header = () => {
       display:'Chats',
       active:!status
     }
+    
   ]
 
 
@@ -115,13 +123,14 @@ const Header = () => {
        <div className=' flex items-center gap-4'>
 
         {token && user ?(
-          <div>
+          <div className=' flex gap-3'>
           <Link to={`/${role==='patient'?'user':'doctor'}/profile/me`}>
           <figure className=' w-[35px] h-[35px] rounded-full '>
           <img src={user?.photo} alt="" className=' w-full rounded-full' />
           </figure>
-          
           </Link>
+          <button onClick={handleLogout} className=' bg-red-500 py-2 px-6 text-white font-[600] h-[44px] flex items-center justify-center rounded-[50px] '>Logout
+         </button>
         </div>
         ):(
       <Link to='/login'>

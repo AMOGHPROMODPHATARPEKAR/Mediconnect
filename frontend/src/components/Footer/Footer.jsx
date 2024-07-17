@@ -32,26 +32,23 @@ const quickLinks01 =[
     path:"/services",
     display:"Services"
   },
-  {
-    path:"/",
-    display:"Blog"
-  },
+  
 ]
 const quickLinks02 =[
   {
-    path:"/find-a-doctor",
+    path:"/doctors",
     display:"FInd a doctor"
   },
   {
-    path:"/",
+    path:"/doctors",
     display:"Request Appointment"
   },
   {
-    path:"/",
+    path:"/doctors",
     display:"FInd location"
   },
   {
-    path:"/",
+    path:"/doctors",
     display:"Get Opinion"
   },
 ]
@@ -61,7 +58,7 @@ const quickLinks03 =[
     display:"Donate"
   },
   {
-    path:"/",
+    path:"/contact",
     display:"Contact Us"
   },
   

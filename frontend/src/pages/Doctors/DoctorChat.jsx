@@ -29,6 +29,10 @@ const DoctorChat = () => {
             </div>
         </div>
       )}
+
+      {appointments?.length==0 && 
+      <h1 className=' text-center font-[600] text-[50px] text-blue-700 '>No Booking</h1>
+      }
       
     </div>
   </section>

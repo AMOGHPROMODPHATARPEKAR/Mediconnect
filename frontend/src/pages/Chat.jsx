@@ -1,59 +1,56 @@
-import React, { useEffect, useState } from 'react'
-import { useContext } from 'react'
-import { useParams } from 'react-router-dom'
-import { authContext } from '../context/AuthContext'
-import useFetchData from '../hooks/useFetchData'
-import { BASE_URL } from '../config'
-import { addDoc, collection, serverTimestamp ,onSnapshot, query, where, orderBy } from 'firebase/firestore'
-import { db } from '../utils/firebase.js'
+import React, { useEffect, useState } from 'react';
+import { useContext } from 'react';
+import { useParams } from 'react-router-dom';
+import { authContext } from '../context/AuthContext';
+import useFetchData from '../hooks/useFetchData';
+import { BASE_URL } from '../config';
+import { addDoc, collection, serverTimestamp, onSnapshot, query, where, orderBy } from 'firebase/firestore';
+import { db } from '../utils/firebase.js';
+import { format } from 'date-fns';
 
 const Chat = () => {
-    const {id} = useParams()
-    const {user,role,token} = useContext(authContext);
-    // if(role === 'patient'){
-    //   var {data:receiverData,loading,error} = useFetchData(`${BASE_URL}/doctor/${id}`)
-    // }else
-    // {
-    //   var {data:receiverData} = useFetchData(`${BASE_URL}/user/${id}`)
-    // }
-    let receiverData
-    role === 'patient'? {data:receiverData} = useFetchData(`${BASE_URL}/doctor/${id}`):{data:receiverData} = useFetchData(`${BASE_URL}/user/${id}`);
-    const [messages, setMessages] = useState([]);
-    const [input, setInput] = useState('');
+  const { id } = useParams();
+  const { user, role } = useContext(authContext);
 
-    const messagesRef = collection(db,"messages");
+  let receiverData;
+  role === 'patient'
+    ? ({ data: receiverData } = useFetchData(`${BASE_URL}/doctor/${id}`))
+    : ({ data: receiverData } = useFetchData(`${BASE_URL}/user/${id}`));
 
-console.log(user)
-  const handleSendMessage = async(e)=>{
+  const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState('');
+
+  const messagesRef = collection(db, "messages");
+
+  const handleSendMessage = async (e) => {
     e.preventDefault();
-    if(input === '') return;
+    if (input === '') return;
 
-    await addDoc(messagesRef,{
-      text:input,
-      createdAt:serverTimestamp(),
-      sender:user?._id,
-      role:role,
-      receiver:receiverData?._id
-    })
+    await addDoc(messagesRef, {
+      text: input,
+      createdAt: serverTimestamp(),
+      sender: user?._id,
+      role: role,
+      receiver: receiverData?._id
+    });
 
-    setInput('')
-  }
-  
+    setInput('');
+  };
+
   useEffect(() => {
     if (user && receiverData?._id !== undefined) {
       const messagesRef = collection(db, 'messages');
      
       const queryMessages = query(
         messagesRef,
-        where('sender', 'in', [user._id,receiverData._id]),
-        where('receiver', 'in', [user._id,receiverData._id]),
+        where('sender', 'in', [user._id, receiverData._id]),
+        where('receiver', 'in', [user._id, receiverData._id]),
         orderBy("createdAt")
       );
 
       const unsubscribe = onSnapshot(queryMessages, (snapshot) => {
         const newMessages = snapshot.docs.map(doc => doc.data());
         setMessages(newMessages);
-        
       });
 
       return () => unsubscribe(); // Cleanup subscription on unmount
@@ -69,7 +66,12 @@ console.log(user)
       <div style={styles.messageContainer} className=' flex flex-col h-[200px]' >
         {messages.map((message, index) => (
           <div key={index} style={message.role === role ? styles.userMessage : styles.doctorMessage}>
-            {message.text}
+            <div>{message.text}</div>
+            <div style={styles.timestamp}>
+              {message.createdAt?.seconds
+                ? format(new Date(message.createdAt.seconds * 1000), 'Pp')
+                : 'Sending...'}
+            </div>
           </div>
         ))}
       </div>
@@ -97,6 +99,7 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     fontFamily: 'Arial, sans-serif',
+    height: '500px', // Increased height
   },
   header: {
     display: 'flex',
@@ -108,8 +111,8 @@ const styles = {
   doctorPhoto: {
     borderRadius: '50%',
     marginRight: '10px',
-    height:'50px',
-    width:'50px',
+    height: '50px',
+    width: '50px',
   },
   doctorName: {
     fontSize: '18px',
@@ -119,6 +122,7 @@ const styles = {
     padding: '10px',
     overflowY: 'auto',
     backgroundColor: '#f9f9f9',
+    flexGrow: 1,
   },
   userMessage: {
     alignSelf: 'flex-end',
@@ -136,6 +140,11 @@ const styles = {
     margin: '5px 0',
     maxWidth: '80%',
     boxShadow: '0 0 2px rgba(0, 0, 0, 0.1)',
+  },
+  timestamp: {
+    fontSize: '10px',
+    color: '#999',
+    marginTop: '5px',
   },
   inputContainer: {
     display: 'flex',
@@ -161,5 +170,4 @@ const styles = {
   },
 };
 
-
-export default Chat
+export default Chat;
