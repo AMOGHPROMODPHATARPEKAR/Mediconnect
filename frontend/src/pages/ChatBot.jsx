@@ -1,10 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, Button, Container, TextField, Typography, Paper, List, ListItem, ListItemText } from '@mui/material';
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
-import { useEffect } from 'react';
-const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
-// console.log(GEMINI_API_KEY)
+import axios from 'axios';
 
+const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 
 const ChatBot = () => {
   const MODEL_NAME = 'gemini-1.0-pro';
@@ -25,6 +24,7 @@ const ChatBot = () => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [chat, setChat] = useState(null);
+  const [isListening, setIsListening] = useState(false);
 
   // Initialize chat and send initial message when the component mounts
   useEffect(() => {
@@ -40,9 +40,11 @@ const ChatBot = () => {
 
       setChat(newChat);
 
-      // Send initial query to the bot without displaying its reply
       try {
-        const initialQuery = "your name is MediConnectBot you only anwser medical,hospital,diseases and related queries. Whether you need information on symptoms, treatments, or healthcare facilities, just asks. Make sure When asked to suggest doctor give the Different type of Doctors like surgeon, physician,general based on the disease given do not give the doctor name";
+        const initialQuery = `
+          Your name is MediConnectBot. You are a multilingual medical assistant that can communicate in various languages based on the user's input language.
+          When answering questions, ensure your response matches the input language.
+        `;
         await newChat.sendMessage(initialQuery);
       } catch (error) {
         console.error('Error sending initial query:', error.message);
@@ -50,7 +52,7 @@ const ChatBot = () => {
     };
 
     initChat();
-  }, []); // Empty dependency array ensures this effect runs only once
+  }, []);
 
   const handleSendMessage = async () => {
     if (newMessage.trim() && chat) {
@@ -67,9 +69,67 @@ const ChatBot = () => {
         const response = result.response.text();
         const botMessage = { text: response, type: 'received' };
         setMessages((prevMessages) => [...prevMessages, botMessage]);
+
+        // Trigger speech synthesis for the bot's response
+        handleGenerateSpeech(response);
       } catch (error) {
         console.error('An error occurred:', error.message);
       }
+    }
+  };
+
+  const handleGenerateSpeech = async (message) => {
+    if (message.trim()) {
+      try {
+        // Send the text to Flask backend to generate speech
+        const response = await axios.post('http://127.0.0.1:5000/generate-speech', {
+          text: message,
+        });
+  
+        // Get the audio URL from the response
+        const audioUrl = 'http://127.0.0.1:5000' + response.data.audioUrl;
+        // const audioUrl = response.data.audioUrl;
+       
+        // Check if the audio URL is valid
+        if (audioUrl) {
+          const audio = new Audio(audioUrl);
+          audio.play().catch((error) => {
+            console.error('Error playing audio:', error);
+          });
+        } else {
+          console.error('Invalid audio URL:', audioUrl);
+        }
+      } catch (error) {
+        console.error('Error generating speech:', error);
+      }
+    }
+  };
+  
+
+  // Initialize SpeechRecognition for voice input
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const recognition = SpeechRecognition ? new SpeechRecognition() : null;
+
+  if (recognition) {
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = 'en-US';
+
+    recognition.onresult = (event) => {
+      const voiceInput = event.results[0][0].transcript;
+      setNewMessage(voiceInput);
+      setIsListening(false);
+    };
+
+    recognition.onend = () => {
+      setIsListening(false);
+    };
+  }
+
+  const handleVoiceInput = () => {
+    if (recognition && !isListening) {
+      setIsListening(true);
+      recognition.start();
     }
   };
 
@@ -108,6 +168,8 @@ const ChatBot = () => {
           label="Type your message..."
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
+          multiline
+          rows={2}
           onKeyPress={(e) => {
             if (e.key === 'Enter') {
               handleSendMessage();
@@ -116,6 +178,15 @@ const ChatBot = () => {
         />
         <Button variant="contained" color="primary" onClick={handleSendMessage} sx={{ marginLeft: '10px' }}>
           Send
+        </Button>
+        <Button
+          variant="contained"
+          color="secondary"
+          onClick={handleVoiceInput}
+          sx={{ marginLeft: '10px' }}
+          disabled={!SpeechRecognition || isListening}
+        >
+          {isListening ? 'Listening...' : 'Voice'}
         </Button>
       </Box>
     </Container>
