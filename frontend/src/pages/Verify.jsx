@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import uploadToCloudinary from '../utils/uploadToCloudinary.js';
 import HashLoader from 'react-spinners/HashLoader.js';
-import { AiOutlineDelete } from 'react-icons/ai';
+import { AiOutlineDelete,AiOutlineEye } from 'react-icons/ai';
 import { useNavigate } from 'react-router-dom';
 import { BASE_URL, token } from '../config.js';
 import useFetchData from '../hooks/useFetchData.jsx';
@@ -217,14 +217,30 @@ const Verify = () => {
                                 onChange={e =>handleQualificationChange(e,index)}
                                 className=' form__input' />
                             </div>
-                            <div>
-                                <p className=' form__label '>Certificate*</p>
-                                <input type="file"
-                                name='certificate'
-                                onChange={e =>handleFile('qualifications',index,e)}
-                                accept='.jpg, .png'
-                                className=' form__input' />
-                            </div>
+                            <div className="flex items-center gap-4">
+  <p className="form__label">Certificate*</p>
+  <input
+    type="file"
+    name="certificate"
+    onChange={(e) => handleFile("qualifications", index, e)}
+    className="form__input"
+  />
+  {item.certificate && (
+    <div className="flex items-center mt-2">
+      <a
+        href={item.certificate}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-primaryColor flex items-center gap-1"
+      >
+        <AiOutlineEye className="text-[18px]" /> {/* React Icon */}
+        <span >View </span>
+      </a>
+    </div>
+  )}
+</div>
+
+
                             </div>
     
                         <button className=' bg-red-600 p-2 rounded-full text-white text-[18px] mt-2 mb-[30px] cursor-pointer '
@@ -286,7 +302,6 @@ const Verify = () => {
                                 <input type="file"
                                 name='certificate'
                                 onChange={e =>handleFile('experiences',index,e)}
-                                accept='.jpg, .png'
                                 className=' form__input' />
                             </div>
                             </div>

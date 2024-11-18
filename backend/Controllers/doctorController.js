@@ -272,3 +272,85 @@ export const CreatVerify = async(req,res)=>{
         })
     }
 }
+const diseaseToSpecialist = {
+    "Fungal infection": "Dermatologist",
+    "Allergy": "Allergist/Immunologist",
+    "GERD": "Gastroenterologist",
+    "Chronic cholestasis": "Hepatologist",
+    "Drug Reaction": "Allergist/Immunologist",
+    "Peptic ulcer disease": "Gastroenterologist",
+    "AIDS": "Infectious Disease Specialist",
+    "Diabetes": "Endocrinologist",
+    "Gastroenteritis": "Gastroenterologist",
+    "Bronchial Asthma": "Pulmonologist",
+    "Hypertension": "Cardiologist",
+    "Migraine": "Neurologist",
+    "Cervical spondylosis": "Orthopedist",
+    "Paralysis (brain hemorrhage)": "Neurologist",
+    "Jaundice": "Hepatologist",
+    "Malaria": "Infectious Disease Specialist",
+    "Chicken pox": "Infectious Disease Specialist",
+    "Dengue": "Infectious Disease Specialist",
+    "Typhoid": "Infectious Disease Specialist",
+    "Hepatitis A": "Hepatologist",
+    "Hepatitis B": "Hepatologist",
+    "Hepatitis C": "Hepatologist",
+    "Hepatitis D": "Hepatologist",
+    "Hepatitis E": "Hepatologist",
+    "Alcoholic hepatitis": "Hepatologist",
+    "Tuberculosis": "Pulmonologist",
+    "Common Cold": "General Practitioner",
+    "Pneumonia": "Pulmonologist",
+    "Dimorphic hemorrhoids (piles)": "Proctologist",
+    "Heart attack": "Cardiologist",
+    "Varicose veins": "Vascular Surgeon",
+    "Hypothyroidism": "Endocrinologist",
+    "Hyperthyroidism": "Endocrinologist",
+    "Hypoglycemia": "Endocrinologist",
+    "Osteoarthritis": "Orthopedist",
+    "Arthritis": "Rheumatologist",
+    "(vertigo) Paroxysmal Positional Vertigo": "ENT Specialist",
+    "Acne": "Dermatologist",
+    "Urinary tract infection": "Urologist",
+    "Psoriasis": "Dermatologist",
+    "Impetigo": "Dermatologist",
+  };
+
+export const getSpecialist = async (req, res) => {
+    try {
+      const { disease } = req.body;
+        console.log(disease)
+      if (!disease) {
+        return res.status(400).json({ error: "Disease is required" });
+      }
+  
+      // Map disease to specialization
+      const specialization = diseaseToSpecialist[disease] ;
+      
+      if (!specialization) {
+        return res.status(404).json({ error: "No specialist found for this disease" });
+      }
+  
+      // Query MongoDB for doctors with the given specialization
+      const doctors = await Doctor.find({ specialization }).select(
+        "name email phone photo location specialization qualifications averageRating ticketPrice"
+      );
+  
+      if (!doctors.length && specialization !== "General Practitioner") {
+        doctors = await Doctor.find({ specialization: "General Practitioner" }).select(
+          "name email phone photo location specialization qualifications averageRating ticketPrice"
+        );
+    }
+      console.log(doctors)
+  
+      // Respond with the list of doctors
+      res.status(200).json({
+        specialization,
+        doctors,
+      });
+    } catch (error) {
+      console.error("Error fetching specialist:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  };
+  

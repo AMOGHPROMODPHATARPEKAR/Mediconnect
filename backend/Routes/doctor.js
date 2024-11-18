@@ -1,5 +1,5 @@
 import express from 'express'
-import { CreatVerify, deleteDoctor, getAllDoctors, getDoctor, getDoctorProfile, updateDoctor } from '../Controllers/doctorController.js';
+import { CreatVerify, deleteDoctor, getAllDoctors, getDoctor, getDoctorProfile, getSpecialist, updateDoctor } from '../Controllers/doctorController.js';
 import { authenicate ,restrict } from '../auth/verifyToken.js';
 
 import reviewRouter from './review.js'
@@ -16,6 +16,6 @@ router.put('/:id',authenicate,restrict(["doctor"]),updateDoctor);
 router.delete('/:id',authenicate,restrict(["doctor"]),deleteDoctor);
 router.get('/profile/me',authenicate,restrict(["doctor"]),getDoctorProfile);
 router.post('/profile/verify',authenicate,restrict(["doctor"]),CreatVerify);
-
+router.post('/specialist',authenicate,getSpecialist)
 
 export default router;
