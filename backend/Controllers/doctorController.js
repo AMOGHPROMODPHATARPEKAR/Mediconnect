@@ -301,7 +301,7 @@ const diseaseToSpecialist = {
     "Tuberculosis": "Pulmonologist",
     "Common Cold": "General Practitioner",
     "Pneumonia": "Pulmonologist",
-    "Dimorphic hemorrhoids (piles)": "Proctologist",
+    "Dimorphic hemmorhoids(piles)": "Proctologist",
     "Heart attack": "Cardiologist",
     "Varicose veins": "Vascular Surgeon",
     "Hypothyroidism": "Endocrinologist",
@@ -319,20 +319,21 @@ const diseaseToSpecialist = {
 export const getSpecialist = async (req, res) => {
     try {
       const { disease } = req.body;
-        console.log(disease)
+        console.log("ddf",disease)
+
       if (!disease) {
         return res.status(400).json({ error: "Disease is required" });
       }
   
       // Map disease to specialization
       const specialization = diseaseToSpecialist[disease] ;
-      
+      console.log(specialization)
       if (!specialization) {
         return res.status(404).json({ error: "No specialist found for this disease" });
       }
-  
+      
       // Query MongoDB for doctors with the given specialization
-      const doctors = await Doctor.find({ specialization }).select(
+      let doctors = await Doctor.find({ specialization }).select(
         "name email phone photo location specialization qualifications averageRating ticketPrice"
       );
   

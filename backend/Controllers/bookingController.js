@@ -123,3 +123,27 @@ export const deleteBooking = async(req,res)=>{
     }
 
 }
+
+export const getBookedSlots = async (req, res) => {
+    try {
+        const { doctorId } = req.params;
+        console.log("ddd",doctorId)
+        // Find all bookings for the specified doctor
+        const bookings = await Booking.find({ doctor: doctorId }, 'date').lean();
+
+        // Extract the `date` field from the bookings
+        const bookedSlots = bookings.map((booking) => booking.date);
+        console.log(bookedSlots)
+        return res.status(200).json({
+            success: true,
+            message: "Booked slots fetched successfully",
+            data:bookedSlots,
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            success: false,
+            message: "Error fetching booked slots",
+        });
+    }
+};

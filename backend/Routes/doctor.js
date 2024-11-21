@@ -3,6 +3,7 @@ import { CreatVerify, deleteDoctor, getAllDoctors, getDoctor, getDoctorProfile, 
 import { authenicate ,restrict } from '../auth/verifyToken.js';
 
 import reviewRouter from './review.js'
+import { getBookedSlots } from '../Controllers/bookingController.js';
 
 const router = express.Router();
 
@@ -17,5 +18,6 @@ router.delete('/:id',authenicate,restrict(["doctor"]),deleteDoctor);
 router.get('/profile/me',authenicate,restrict(["doctor"]),getDoctorProfile);
 router.post('/profile/verify',authenicate,restrict(["doctor"]),CreatVerify);
 router.post('/specialist',authenicate,getSpecialist)
+router.get('/:doctorId/booked-slots',authenicate, getBookedSlots);
 
 export default router;

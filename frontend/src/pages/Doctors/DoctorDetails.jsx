@@ -18,7 +18,9 @@ const DoctorDetails = () => {
   const {id} = useParams()
   console.log(id)
   const {data:doctor,loading, error} = useFetchData(`${BASE_URL}/doctor/${id}`)
-  console.log(doctor)
+  const {data:bookedSlots,loading2, error2} = useFetchData(`${BASE_URL}/doctor/${id}/booked-slots`)
+  console.log("hd",doctor)
+  console.log("Boo",bookedSlots)
   const {name
     ,specialization,
     averageRating,
@@ -95,7 +97,7 @@ text-textColor">({totalRating})</span>
         </div>
 
         <div>
-          <SlidePanel doctorId={doctor._id} ticketPrice={ticketPrice} timeSlots={timeSlots} />
+          <SlidePanel doctorId={doctor._id} ticketPrice={ticketPrice} timeSlots={timeSlots} bookedSlots ={bookedSlots } />
         </div>
       </div>
     )}
