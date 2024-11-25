@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'react-toastify';
 import { BASE_URL, token } from '../../config.js';
 import HashLoader from 'react-spinners/HashLoader.js';
@@ -9,54 +9,100 @@ const CheckoutSuccess = () => {
 
   const {doctorId,time} = useParams();
   const [loader,setLoader] = useState(false)
+  
+
+  const [isBooked, setIsBooked] = useState(false)
   const navigate = useNavigate()
-    const booking = async()=>{
-      setLoader(true)
-      try {
-        const res = await fetch(`/api/v1/bookings/create/${doctorId}`,{
-  
-          method:'post',
-          headers:{
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body:JSON.stringify({date:time})
-        });
-        const result = await res.json();
-        
-  
-        if(!res.ok){
-          throw new Error(result.message)
-        }
 
-        const emailResponse = await fetch(`${BASE_URL}/bookings/sendEmail`,{
-          method:'post',
-          headers:{
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body:JSON.stringify({ email: result?.data?.user?.email,username: result?.data?.user?.name,date:time,doctorName: result?.data?.doctor?.name })
-          }
-        );
-        const emailRes = await emailResponse.json();
-        if(!emailResponse.ok)
-          {
-              throw new Error(emailRes.message)
-          }
-        
-          toast.success(emailRes.message)
-        toast.success(result.message)
-        navigate('/home')
-
-      } catch (error) {
-        
-        toast.error(error.message)
-      }
-      finally{
-        setLoader(false)
-      }
-
+  const booking = async () => {
+    if (isBooked) {
+      toast.info('Booking already processed');
+      return;
     }
+
+    setLoader(true);
+    try {
+      // Existing booking logic remains the same
+      const res = await fetch(`/api/v1/bookings/create/${doctorId}`, {
+        method: 'post',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ date: time }),
+      });
+      const result = await res.json();
+  
+      if (!res.ok) {
+        throw new Error(result.message);
+      }
+
+     
+      // Step 2: Send email
+      const emailResponse = await fetch(`${BASE_URL}/bookings/sendEmail`, {
+        method: 'post',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          email: result?.data?.user?.email,
+          username: result?.data?.user?.name,
+          date: time,
+          doctorName: result?.data?.doctor?.name,
+        }),
+      });
+      const emailRes = await emailResponse.json();
+      if (!emailResponse.ok) {
+        throw new Error(emailRes.message);
+      }
+  
+      toast.success(emailRes.message);
+  
+      // Step 3: Schedule calendar event
+    const calendarResponse = await fetch(`http://localhost:8000/schedule_event`, {
+      method: 'post',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        summary: `Appointment with Dr. ${result?.data?.doctor?.name}`,
+        location: result?.data?.doctor?.location,
+        description: `Your appointment is scheduled with Dr. ${result?.data?.doctor?.name}.`,
+        start: new Date(time).toISOString(),
+        timeZone: "Asia/Kolkata",
+        duration: 60,
+        userEmail: result?.data?.user?.email,
+        doctorId, // Pass doctorId
+        time // Pass time
+      }),
+    });
+
+    const calendarRes = await calendarResponse.json();
+
+    // Handle potential redirect for OAuth
+    if (calendarRes.redirectUrl) {
+      window.location.href = calendarRes.redirectUrl;
+      return;
+    }
+
+    if (!calendarResponse.ok) {
+      throw new Error(calendarRes.message);
+    }
+
+    toast.success(calendarRes.message);
+
+     
+    setIsBooked(true);
+    navigate('/home');
+    } catch (error) {
+      toast.error(error.message);
+    } finally {
+      setLoader(false);
+    }
+  };
+  
 
   return (
     <div className="bg-gray-100 h-screen">

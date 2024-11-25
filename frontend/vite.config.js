@@ -6,7 +6,9 @@ export default defineConfig({
   server:{
     proxy:{
       '/api':'http://localhost:8000',
-      '/bac':'http://127.0.0.1:5000/'
+      '/bac':'http://127.0.0.1:5000/',
+      '/google': 'http://localhost:8000',
+        
     },
   },
   plugins: [react()],
