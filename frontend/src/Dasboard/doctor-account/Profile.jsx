@@ -21,6 +21,7 @@ const Profile = ({doctorData}) => {
         qualifications:[],
         experiences:[],
         timeSlots:[],
+        languages:[],
         photo:null
 
     });
@@ -44,6 +45,7 @@ const Profile = ({doctorData}) => {
             qualifications:doctorData?.qualifications,
             experiences:doctorData?.experiences,
             timeSlots:doctorData?.timeSlots,
+            languages:doctorData?.languages,
             about:doctorData?.about,
             photo:doctorData?.photo
         })
@@ -71,6 +73,45 @@ const Profile = ({doctorData}) => {
         setFormData({...formData,photo:data.url})
     
       }
+      const addLanguage = e => {
+        e.preventDefault();
+        addItem('languages', {
+            name: '',
+        });
+    }
+    
+    const handleLanguageChange = (event, index) => {
+        handleReusableInputChange('languages', index, event);
+    }
+    
+    const deleteLanguage = (e, index) => {
+        e.preventDefault();
+        deleteItem('languages', index);
+    }
+    
+    // Add the language selection options:
+   
+    
+    const commonLanguages = [
+        'English',
+        'Hindi',
+        'Spanish',
+        'French',
+        'German',
+        'Chinese',
+        'Japanese',
+        'Arabic',
+        'Portuguese',
+        'Russian',
+        'Italian',
+        'Korean',
+        'Turkish',
+        'Bengali',
+        'Kannada',
+        'Tamil',
+        'Telugu',
+        'Malayalam'
+    ];
 
       const updateProfileHandler = async(e)=>{
         e.preventDefault();
@@ -195,7 +236,7 @@ const Profile = ({doctorData}) => {
         e.preventDefault();
         deleteItem('timeSlots',index);
       }
-
+     const specialists =  ['Dermatologist', 'Infectious Disease Specialist', 'General Practitioner', 'Hepatologist', 'Urologist', 'Allergist/Immunologist', 'Rheumatologist', 'Pulmonologist', 'Neurologist', 'Gastroenterologist', 'Proctologist', 'ENT Specialist', 'Vascular Surgeon', 'Orthopedist', 'Cardiologist', 'Endocrinologist']
   return (
     <div>
     <h2>Profile Information</h2>
@@ -263,6 +304,42 @@ const Profile = ({doctorData}) => {
             
             />
         </div>
+        <div className='mb-5'>
+    <p className='form__label'>Languages</p>
+    {formData.languages?.map((item, index) => (
+        <div key={index}>
+            <div className='grid grid-cols-2 gap-5 mb-4'>
+                <div>
+                    <p className='form__label'>Language*</p>
+                    <select
+                        name='name'
+                        value={item.name}
+                        onChange={e => handleLanguageChange(e, index)}
+                        className='form__input py-3.5'
+                    >
+                        <option value="">Select Language</option>
+                        {commonLanguages.map(lang => (
+                            <option key={lang} value={lang}>{lang}</option>
+                        ))}
+                    </select>
+                </div>
+                
+            </div>
+            <button 
+                className='bg-red-600 p-2 rounded-full text-white text-[18px] mb-[30px] cursor-pointer'
+                onClick={e => deleteLanguage(e, index)}
+            >
+                <AiOutlineDelete/>
+            </button>
+        </div>
+    ))}
+    <button 
+        onClick={addLanguage} 
+        className='bg-[#000] py-2 px-5 rounded text-white h-fit cursor-pointer'
+    >
+        Add Language
+    </button>
+</div>
 
         <div className="mb-5">
             <div className=' grid grid-cols-3 gap-5 mb-[30px] '>
@@ -280,10 +357,10 @@ const Profile = ({doctorData}) => {
                     <p className='form__label'>Specialization</p>
                     <select name="specialization" value={formData.specialization} onChange={handleChange}
                     className=' form__input py-3.5'>
-                        <option value="">Select</option>
-                        <option value="surgeon">Surgeon</option>
-                        <option value="neurologist">Neurologist</option>
-                        <option value="dermatologist">Dermatologist</option>
+                        
+                       { specialists.map(specialist => (
+             <option key={specialist} value={specialist}>{specialist}</option>
+             )) }
                     </select>
                 </div>
 

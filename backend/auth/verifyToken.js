@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken'
 export const authenicate = async(req,res,next)=>{
     //get token
     const authToken = req.headers.authorization;
-    
+    // console.log("auth",authToken)
     //check if token exists
     if(!authToken || !authToken.startsWith('Bearer')){
         return res.status(401)
