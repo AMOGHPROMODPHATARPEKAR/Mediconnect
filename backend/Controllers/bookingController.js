@@ -147,3 +147,79 @@ export const getBookedSlots = async (req, res) => {
         });
     }
 };
+
+export const updateBookingStatus = async(req, res) => {
+    try {
+        const bookingId = req.params.id;
+        const { status, remarks, reportUrl } = req.body;
+        
+        // Validate inputs
+        if (!bookingId) {
+            return res.status(400).json({
+                success: false,
+                message: "Booking ID is required"
+            });
+        }
+
+        if (!status || !remarks) {
+            return res.status(400).json({
+                success: false,
+                message: "Status and remarks are required"
+            });
+        }
+
+        // Update the booking
+        const updatedBooking = await Booking.findByIdAndUpdate(
+            bookingId,
+            {
+                status,
+                remarks,
+                reportUrl: reportUrl || '',
+                completedAt: status === 'completed' ? new Date() : null
+            },
+            { new: true }
+        ).populate('user').populate('doctor');
+
+        if (!updatedBooking) {
+            return res.status(404).json({
+                success: false,
+                message: "Booking not found"
+            });
+        }
+
+        // If status is completed, send email notification
+        if (status === 'completed') {
+            try {
+                await sendEmail({
+                    email: updatedBooking.user.email,
+                    subject: "Appointment Completed",
+                    template: "appointmentCompleted",
+                    data: {
+                        name: updatedBooking.user.name,
+                        doctorName: updatedBooking.doctor.name,
+                        date: updatedBooking.date,
+                        remarks: remarks,
+                        reportUrl: reportUrl || null
+                    }
+                });
+            } catch (emailError) {
+                console.error("Error sending completion email:", emailError);
+                // Continue execution even if email fails
+            }
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "Booking status updated successfully",
+            data: updatedBooking
+        });
+
+    } catch (error) {
+        console.error("Error in updateBookingStatus:", error);
+        res.status(500).json({
+            success: false,
+            message: "Failed to update booking status",
+            error: error.message
+        });
+    }
+};

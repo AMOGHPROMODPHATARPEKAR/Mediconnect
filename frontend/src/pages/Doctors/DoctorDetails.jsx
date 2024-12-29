@@ -32,7 +32,8 @@ const DoctorDetails = () => {
     bio,
     about,
     timeSlots,
-    reviews
+    reviews,
+    languages
   } = doctor;
 
   return <section>
@@ -87,7 +88,7 @@ text-textColor">({totalRating})</span>
 
         <div className=' mt-[50px] '>
           {
-            tab === 'about' && <DoctorAbout name={name}about={about} qualifications={qualifications} experiences={experiences}  />
+            tab === 'about' && <DoctorAbout name={name}about={about} qualifications={qualifications} experiences={experiences} languages={languages}  />
           }
           {
             tab === 'feedback' && <Feedback reviews={reviews} totalRating={totalRating} />

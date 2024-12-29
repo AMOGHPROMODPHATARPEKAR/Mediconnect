@@ -1,7 +1,7 @@
 import React from 'react'
 import { formateDate } from '../../utils/formateDate'
 
-const DoctorAbout = ({name,about,qualifications,experiences}) => {
+const DoctorAbout = ({name,about,qualifications,experiences,languages}) => {
   return (
     <div>
       <div>
@@ -42,6 +42,22 @@ const DoctorAbout = ({name,about,qualifications,experiences}) => {
         </ul>
 
       </div>
+
+      <div className=' mt-12'>
+      <h3 className="text-[20px] leading-[30px) ☐ text-headingColor font-semibold ">Langauges
+        </h3>
+
+        <ul className="grid sm:grid-cols-2 gap-[30px] pt-4 md:p-5">
+          {languages?.map((item,index)=>(
+            <li key={index} className='p-4 rounded bg-[#cad7ff]'  >
+            {item?.name}
+          </li>
+          ))}
+ 
+        </ul>
+
+      </div>
+      
 
     </div>
   )

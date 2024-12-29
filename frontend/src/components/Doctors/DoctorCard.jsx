@@ -15,7 +15,9 @@ const DoctorCard = ({doctor,booking,bookingId}) => {
     totalRating,
     photo,
     experiences,
-location} = doctor;
+location,languages} = doctor;
+
+console.log("lla",languages)
 
     const navigate = useNavigate()
 
@@ -74,7 +76,11 @@ location} = doctor;
             <div>
                 {/* <h3 className=' text-[16px] leading-7 lg:text-[18px] lg:leading-[30px] font-semibold text-headingColor '>+{totalPatients} patients</h3> */}
                 <p className=' text-[14px] leading-6 font-[400] text-textColor  '>At {experiences && experiences[0]?.hospital}</p>
+                
                 <p className=' text-[14px] leading-6 font-[400] text-textColor  '>Location - {location}</p>
+                <p className=' text-[14px] leading-6 font-[400] text-textColor'>
+  Languages - {languages?.map(lang => lang.name).join(', ')}
+</p>
             </div>
 
             

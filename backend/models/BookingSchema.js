@@ -15,19 +15,21 @@ const bookingSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
-
     ticketPrice: { type: String, required: true },
-    
-    
     status: {
       type: String,
-      enum: ["pending", "approved", "cancelled"],
+      enum: ["pending", "approved", "cancelled", "completed"],
       default: "pending",
     },
-    date:{
+    date: {
+      type: String,
+      required: true
+    },
+    remarks:{
       type:String,
-      required:true
-      
+    },
+    reportUrl:{
+      type:String
     },
     isPaid: {
       type: Boolean,
@@ -36,43 +38,61 @@ const bookingSchema = new mongoose.Schema(
     expiresAt: {
       type: Date,
       required: true
-  }
+    }
   },
   { timestamps: true }
 );
 
-bookingSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+// Create a TTL index that will trigger our completion check
+bookingSchema.index({ expiresAt: 1 });
 
-bookingSchema.pre(/^find/,function(next){
- this.populate('user').populate({
-  path:'doctor',
-  select:'name'
- })
+// Add pre-save middleware to check and update status
+bookingSchema.pre('save', function(next) {
+  if (this.expiresAt && this.expiresAt < new Date() && this.status !== 'cancelled') {
+    this.status = 'completed';
+  }
+  next();
+});
 
- next();
-})
+// Add a scheduled task to update expired appointments
+bookingSchema.statics.updateExpiredAppointments = async function() {
+  const now = new Date();
+  await this.updateMany(
+    {
+      expiresAt: { $lt: now },
+      status: { $nin: ['completed', 'cancelled'] }
+    },
+    {
+      $set: { status: 'completed' }
+    }
+  );
+};
 
+bookingSchema.pre(/^find/, function(next) {
+  this.populate('user').populate({
+    path: 'doctor',
+    select: 'name'
+  });
+  next();
+});
 
-bookingSchema.statics.updateAppointments = async function(Booking){
+bookingSchema.statics.updateAppointments = async function(Booking) {
   await DoctorSchema.findByIdAndUpdate(
     Booking.doctor,
     {
-      $push:{"appointments":Booking._id}
+      $push: { "appointments": Booking._id }
     }
   );
-
 
   await UserSchema.findByIdAndUpdate(
     Booking.user,
     {
-      $push:{"appointments":Booking._id}
+      $push: { "appointments": Booking._id }
     }
-  )
+  );
+};
 
-}
-
-// Static method to remove appointments when booking is deleted
-bookingSchema.statics.removeAppointments = async function (booking) {
+bookingSchema.statics.removeAppointments = async function(booking) {
   await DoctorSchema.findByIdAndUpdate(
     booking.doctor,
     { $pull: { appointments: booking._id } }
@@ -89,15 +109,13 @@ bookingSchema.statics.removeAppointments = async function (booking) {
     doctorName: booking.doctor.name,
     date: booking.date,
   });
-
 };
 
-bookingSchema.post("save",function(){
+bookingSchema.post("save", function() {
   this.constructor.updateAppointments(this);
-})
+});
 
-// Middleware to remove appointments when booking is deleted
-bookingSchema.pre('remove', function (next) {
+bookingSchema.pre('remove', function(next) {
   this.constructor.removeAppointments(this).then(() => next());
 });
 

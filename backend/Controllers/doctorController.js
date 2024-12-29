@@ -315,43 +315,82 @@ const diseaseToSpecialist = {
     "Psoriasis": "Dermatologist",
     "Impetigo": "Dermatologist",
   };
-
+  const  LANGUAGE_CODES = {
+    'en': 'English',    
+    'hi': 'Hindi',   
+    'kn': 'Kannada',   
+    'es': 'Spanish',    
+    'fr': 'French',   
+    'de': 'German'     
+}
 export const getSpecialist = async (req, res) => {
     try {
-      const { disease } = req.body;
-        console.log("ddf",disease)
+        const { disease, lang } = req.body;
+        console.log("ddf", disease, lang);
 
-      if (!disease) {
-        return res.status(400).json({ error: "Disease is required" });
-      }
-  
-      // Map disease to specialization
-      const specialization = diseaseToSpecialist[disease] ;
-      console.log(specialization)
-      if (!specialization) {
-        return res.status(404).json({ error: "No specialist found for this disease" });
-      }
-      
-      // Query MongoDB for doctors with the given specialization
-      let doctors = await Doctor.find({ specialization }).select(
-        "name email phone photo location specialization qualifications averageRating ticketPrice"
-      );
-  
-      if (!doctors.length && specialization !== "General Practitioner") {
-        doctors = await Doctor.find({ specialization: "General Practitioner" }).select(
-          "name email phone photo location specialization qualifications averageRating ticketPrice"
-        );
-    }
-      console.log(doctors)
-  
-      // Respond with the list of doctors
-      res.status(200).json({
-        specialization,
-        doctors,
-      });
+        if (!disease) {
+            return res.status(400).json({ error: "Disease is required" });
+        }
+
+        // Convert language code to full language name
+        const requestedLanguage = LANGUAGE_CODES[lang?.toLowerCase()];
+        if (lang && !requestedLanguage) {
+            return res.status(400).json({ error: "Invalid language code" });
+        }
+
+        // Map disease to specialization
+        const specialization = diseaseToSpecialist[disease];
+        console.log(specialization);
+        if (!specialization) {
+            return res.status(404).json({ error: "No specialist found for this disease" });
+        }
+
+        // Query MongoDB for doctors with the given specialization
+        let doctors = await Doctor.find({ specialization })
+            .populate('languages')
+            .select("name email phone photo location specialization qualifications averageRating ticketPrice languages");
+
+        // If no specialists found, fall back to General Practitioners
+        if (!doctors.length && specialization !== "General Practitioner") {
+            doctors = await Doctor.find({ specialization: "General Practitioner" })
+                .populate('languages')
+                .select("name email phone photo location specialization qualifications averageRating ticketPrice languages");
+        }
+
+        // Sort doctors based on language preference
+        if (requestedLanguage) {
+            doctors = doctors.sort((a, b) => {
+                // Check if doctors speak the requested language
+                const aHasLang = a.languages.some(l => l.name === requestedLanguage);
+                const bHasLang = b.languages.some(l => l.name === requestedLanguage);
+
+                if (aHasLang && !bHasLang) return -1;  // a comes first
+                if (!aHasLang && bHasLang) return 1;   // b comes first
+                
+                // If both have or don't have the language, sort by rating
+                return (b.averageRating || 0) - (a.averageRating || 0);
+            });
+        } else {
+            // If no language preference, sort by rating
+            doctors = doctors.sort((a, b) => (b.averageRating || 0) - (a.averageRating || 0));
+        }
+
+        // Add a flag to indicate if each doctor speaks the requested language
+        const doctorsWithLanguageInfo = doctors.map(doctor => ({
+            ...doctor.toObject(),
+            speaksRequestedLanguage: requestedLanguage ? 
+                doctor.languages.some(l => l.name === requestedLanguage) : 
+                undefined
+        }));
+
+        // Respond with the list of doctors
+        res.status(200).json({
+            specialization,
+            requestedLanguage,
+            doctors: doctorsWithLanguageInfo
+        });
     } catch (error) {
-      console.error("Error fetching specialist:", error);
-      res.status(500).json({ error: "Internal Server Error" });
+        console.error("Error fetching specialist:", error);
+        res.status(500).json({ error: "Internal Server Error" });
     }
-  };
-  
+};

@@ -186,7 +186,8 @@ const ChatBot = () => {
       console.log("token ",token)
       const response = await axios.post(
         `http://localhost:8000/api/v1/doctor/specialist`,
-        { disease },
+        { disease ,lang: state.selectedLanguage},
+        
         {
           headers: { Authorization: `Bearer ${token}` },
         }
