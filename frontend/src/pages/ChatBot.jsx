@@ -257,7 +257,7 @@ const ChatBot = () => {
       const voiceInput = event.results[0][0].transcript;
       setState(prev => ({ 
         ...prev, 
-        newMessage: voiceInput,
+        newMessage: prev.newMessage ? `${prev.newMessage} ${voiceInput}` : voiceInput,
         isListening: false 
       }));
     };

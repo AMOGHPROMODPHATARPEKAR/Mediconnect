@@ -7,6 +7,8 @@ import { BASE_URL } from '../config';
 import { addDoc, collection, serverTimestamp, onSnapshot, query, where, orderBy } from 'firebase/firestore';
 import { db } from '../utils/firebase.js';
 import { format } from 'date-fns';
+import { Upload } from 'lucide-react';
+import uploadToCloudinary from '../utils/uploadToCloudinary.js';
 
 const Chat = () => {
   const { id } = useParams();
@@ -19,22 +21,69 @@ const Chat = () => {
 
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState('');
+  const [isUploading, setIsUploading] = useState(false);
 
   const messagesRef = collection(db, "messages");
 
+  const handleFileSelect = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setSelectedFile(file);
+      const fileUrl = URL.createObjectURL(file);
+      setPreviewUrl(fileUrl);
+    }
+  };
+
+  const handleUpload = async () => {
+    if (!selectedFile) return;
+    
+    setIsUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', selectedFile);
+      
+      const uploadedData = await uploadToCloudinary(selectedFile);
+      
+      // Send message with file URL
+      await addDoc(messagesRef, {
+        text: input,
+        fileUrl: uploadedData.url,
+        fileType: selectedFile.type,
+        createdAt: serverTimestamp(),
+        sender: user?._id,
+        role: role,
+        receiver: receiverData?._id
+      });
+
+      // Clear file preview and input
+      setSelectedFile(null);
+      setPreviewUrl('');
+      setInput('');
+    } catch (error) {
+      console.error('Upload failed:', error);
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   const handleSendMessage = async (e) => {
     e.preventDefault();
-    if (input === '') return;
+    if (input === '' && !selectedFile) return;
 
-    await addDoc(messagesRef, {
-      text: input,
-      createdAt: serverTimestamp(),
-      sender: user?._id,
-      role: role,
-      receiver: receiverData?._id
-    });
-
-    setInput('');
+    if (selectedFile) {
+      await handleUpload();
+    } else {
+      await addDoc(messagesRef, {
+        text: input,
+        createdAt: serverTimestamp(),
+        sender: user?._id,
+        role: role,
+        receiver: receiverData?._id
+      });
+      setInput('');
+    }
   };
 
   useEffect(() => {
@@ -53,9 +102,33 @@ const Chat = () => {
         setMessages(newMessages);
       });
 
-      return () => unsubscribe(); // Cleanup subscription on unmount
+      return () => unsubscribe();
     }
   }, [user, receiverData]);
+
+  const renderMessage = (message) => {
+    return (
+      <div>
+        {message.text && <div>{message.text}</div>}
+        {message.fileUrl && (
+          <div style={styles.filePreview}>
+            {message.fileType?.startsWith('image/') ? (
+              <img src={message.fileUrl} alt="Shared" style={styles.previewImage} />
+            ) : (
+              <a href={message.fileUrl} target="_blank" rel="noopener noreferrer" style={styles.fileLink}>
+                View File
+              </a>
+            )}
+          </div>
+        )}
+        <div style={styles.timestamp}>
+          {message.createdAt?.seconds
+            ? format(new Date(message.createdAt.seconds * 1000), 'Pp')
+            : 'Sending...'}
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div style={styles.chatContainer}>
@@ -63,18 +136,33 @@ const Chat = () => {
         <img src={receiverData?.photo} alt="Doctor" style={styles.doctorPhoto} />
         <span style={styles.doctorName}>{receiverData?.name}</span>
       </div>
-      <div style={styles.messageContainer} className=' flex flex-col h-[200px]' >
+      <div style={styles.messageContainer} className='flex flex-col h-[200px]'>
         {messages.map((message, index) => (
           <div key={index} style={message.role === role ? styles.userMessage : styles.doctorMessage}>
-            <div>{message.text}</div>
-            <div style={styles.timestamp}>
-              {message.createdAt?.seconds
-                ? format(new Date(message.createdAt.seconds * 1000), 'Pp')
-                : 'Sending...'}
-            </div>
+            {renderMessage(message)}
           </div>
         ))}
       </div>
+      {previewUrl && (
+        <div style={styles.previewContainer}>
+          {selectedFile?.type.startsWith('image/') ? (
+            <img src={previewUrl} alt="Preview" style={styles.previewImage} />
+          ) : (
+            <div style={styles.filePreview}>
+              Selected file: {selectedFile?.name}
+            </div>
+          )}
+          <button 
+            onClick={() => {
+              setSelectedFile(null);
+              setPreviewUrl('');
+            }}
+            style={styles.removeButton}
+          >
+            ×
+          </button>
+        </div>
+      )}
       <div style={styles.inputContainer}>
         <input
           type="text"
@@ -83,13 +171,74 @@ const Chat = () => {
           style={styles.input}
           placeholder="Type a message..."
         />
-        <button onClick={handleSendMessage} style={styles.sendButton}>Send</button>
+        <label style={styles.uploadButton}>
+          <Upload size={20} />
+          <input
+            type="file"
+            onChange={handleFileSelect}
+            style={{ display: 'none' }}
+            accept="image/*,.pdf,.doc,.docx"
+          />
+        </label>
+        <button 
+          onClick={handleSendMessage} 
+          style={styles.sendButton}
+          disabled={isUploading}
+        >
+          {isUploading ? 'Uploading...' : 'Send'}
+        </button>
       </div>
     </div>
   );
 };
 
 const styles = {
+  // ... (previous styles remain the same)
+  previewContainer: {
+    position: 'relative',
+    padding: '10px',
+    backgroundColor: '#f0f0f0',
+    borderTop: '1px solid #ccc',
+  },
+  previewImage: {
+    maxWidth: '200px',
+    maxHeight: '200px',
+    objectFit: 'contain',
+    borderRadius: '4px',
+  },
+  removeButton: {
+    position: 'absolute',
+    top: '5px',
+    right: '5px',
+    background: 'rgba(0, 0, 0, 0.5)',
+    color: 'white',
+    border: 'none',
+    borderRadius: '50%',
+    width: '20px',
+    height: '20px',
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  uploadButton: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '10px',
+    cursor: 'pointer',
+    color: '#007bff',
+  },
+  filePreview: {
+    marginTop: '5px',
+    padding: '5px',
+    backgroundColor: 'rgba(0, 0, 0, 0.05)',
+    borderRadius: '4px',
+  },
+  fileLink: {
+    color: '#007bff',
+    textDecoration: 'none',
+  },
   chatContainer: {
     width: '400px',
     margin: '50px auto',
@@ -167,7 +316,7 @@ const styles = {
     border: 'none',
     borderRadius: '20px',
     cursor: 'pointer',
-  },
+  }
 };
 
 export default Chat;

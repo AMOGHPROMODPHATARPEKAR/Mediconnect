@@ -9,6 +9,7 @@ const DoctorChat = () => {
     const {data,loading,error} = useFetchData(`${BASE_URL}/doctor/profile/me`)
     const navigate = useNavigate();
     const appointments = data?.appointements;
+    const activeAppointments = appointments?.filter(item => item.status !== 'completed') || [];
     console.log("dsd",appointments,data)
     return <section>
     <div className=' max-w-[1170px] px-5 mx-auto '>
@@ -18,7 +19,7 @@ const DoctorChat = () => {
       {!loading && !error && (
         <div className=' flex items-center justify-center mt-6  '>
             <div >
-                {appointments?.map((item)=>(
+                {activeAppointments?.map((item)=>(
                     <div key={item._id} className='flex justify-center items-center p-2 m-1  border border-solid border-[#ccc] rounded-md w-[500px] cursor-pointer' onClick={()=>navigate(`/chat/${item.user?._id}`)} >
                         <img src={item.user?.photo} className="w-[40px] h-[40px] rounded-full"/>
                         <div className="pl-5 ">

@@ -54,7 +54,7 @@ const connectDB = async()=>{
     }
 }
 
-initializeScheduler();
+// initializeScheduler();
     
     const corsOptions = {
         origin:true
@@ -77,7 +77,7 @@ app.use('/api/v1/bookings',bookingRoute);
 //calendar
 import {google} from 'googleapis'
 import dayjs from 'dayjs'
-import initializeScheduler from './utils/cronScheduler.js';
+
 
 const  calendar = google.calendar({
   version:'v3',

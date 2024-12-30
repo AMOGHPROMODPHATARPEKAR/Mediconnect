@@ -35,38 +35,13 @@ const bookingSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
-    expiresAt: {
-      type: Date,
-      required: true
-    }
+    
   },
   { timestamps: true }
 );
 
-// Create a TTL index that will trigger our completion check
-bookingSchema.index({ expiresAt: 1 });
 
-// Add pre-save middleware to check and update status
-bookingSchema.pre('save', function(next) {
-  if (this.expiresAt && this.expiresAt < new Date() && this.status !== 'cancelled') {
-    this.status = 'completed';
-  }
-  next();
-});
 
-// Add a scheduled task to update expired appointments
-bookingSchema.statics.updateExpiredAppointments = async function() {
-  const now = new Date();
-  await this.updateMany(
-    {
-      expiresAt: { $lt: now },
-      status: { $nin: ['completed', 'cancelled'] }
-    },
-    {
-      $set: { status: 'completed' }
-    }
-  );
-};
 
 bookingSchema.pre(/^find/, function(next) {
   this.populate('user').populate({

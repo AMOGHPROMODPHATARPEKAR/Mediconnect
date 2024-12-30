@@ -66,7 +66,7 @@ export const createBooking = async (req,res)=>{
             ticketPrice:doctor.ticketPrice,
             status:'approved',
             date:date,
-            expiresAt:d,
+            
            })
     
          await booking.save();
@@ -175,7 +175,7 @@ export const updateBookingStatus = async(req, res) => {
                 status,
                 remarks,
                 reportUrl: reportUrl || '',
-                completedAt: status === 'completed' ? new Date() : null
+                
             },
             { new: true }
         ).populate('user').populate('doctor');

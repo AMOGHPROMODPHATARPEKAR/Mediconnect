@@ -6,11 +6,14 @@ import { toast } from 'react-toastify';
 const SlidePanel = ({ doctorId, timeSlots, ticketPrice, bookedSlots }) => {
     const [time, setTime] = useState('');
 
-    // Function to check if a date is in the past
-    const isExpired = (date) => {
-        const today = new Date();
-        const slotDate = new Date(date);
-        return slotDate < today;
+    // Function to check if a time slot is expired based on ending time
+    const isExpired = (date, endTime) => {
+        const now = new Date();
+        const [hours, minutes] = endTime.split(':');
+        const slotDateTime = new Date(date);
+        slotDateTime.setHours(parseInt(hours), parseInt(minutes), 0);
+        
+        return slotDateTime < now;
     };
 
     const bookingHandler = async () => {
@@ -55,7 +58,7 @@ const SlidePanel = ({ doctorId, timeSlots, ticketPrice, bookedSlots }) => {
                 <ul className="mt-3">
                     {timeSlots?.map((item, index) => {
                         const isBooked = bookedSlots.includes(item.day);
-                        const expired = isExpired(item.day);
+                        const expired = isExpired(item.day, item.endingTime);
 
                         return (
                             <li
