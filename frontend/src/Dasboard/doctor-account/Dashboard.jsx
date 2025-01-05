@@ -82,7 +82,7 @@ text-[12px] leading-4 lg:text-[16px] lg:leading-6 font-semibold">
                   </div>
 
                   </div>
-                  <DoctorAbout name={data.name} about={data.about} qualifications = {data.qualifications} experiences={data.experiences} />
+                  <DoctorAbout name={data.name} about={data.about} qualifications = {data.qualifications} experiences={data.experiences} languages={data?.languages} />
                   </div>}
 
 

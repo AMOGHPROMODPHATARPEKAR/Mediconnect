@@ -10,7 +10,7 @@ import { toast } from 'react-toastify';
 
 
 const Verify = () => {
-
+  console.log(token)
   const {data:doctorData} = useFetchData(`${BASE_URL}/doctor/profile/me`)
 
   const [formData,setFormData] = useState({

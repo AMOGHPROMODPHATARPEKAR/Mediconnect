@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom'
 import HashLoader from 'react-spinners/HashLoader.js'
 
 const Profile = ({doctorData}) => {
-
+console.log(token)
     const [formData, setFormData] = useState({
         name:'',
         email:'',
@@ -25,6 +25,9 @@ const Profile = ({doctorData}) => {
         photo:null
 
     });
+
+    const [isUploading, setIsUploading] = useState(false);
+  const [isUploadComplete, setIsUploadComplete] = useState(true);
     const today = new Date();
     const todayString = today.toISOString().split('T')[0]; // Get YYYY-MM-DD format
 
@@ -60,7 +63,8 @@ const Profile = ({doctorData}) => {
 
       const handleFileInput = async(e)=>{
         const file = e.target.files[0]
-        
+        setIsUploading(true);
+        setIsUploadComplete(false)
         const data = await uploadToCloudinary(file);
     
         if(!data)
@@ -71,6 +75,8 @@ const Profile = ({doctorData}) => {
     console.log(data)
         
         setFormData({...formData,photo:data.url})
+        setIsUploading(false);
+      setIsUploadComplete(true);
     
       }
       const addLanguage = e => {
@@ -558,22 +564,35 @@ const Profile = ({doctorData}) => {
               <img src={formData.photo} alt=""  className=' w-full rounded-full' />
             </figure>) }
 
-            <div className=' relative w-[130px] h-[50px] '>
-              <input type="file"  
-              name='photo' 
-              id='customFile' 
-              onChange={handleFileInput}
-              accept='.jpg, .png' 
-              className=' absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer '
-              />
-
-              <label htmlFor="customFile" className=' absolute top-0 left-0 w-full h-full  flex items-center px-[0.75rem] text-[15px] leading-6 overflow-hidden bg-[#0066ff46] text-headingColor font-semibold rounded-lg truncate cursor-pointer  '>Upload Photo</label>
-
+            <div className="relative w-[130px] h-[50px]">
+        <input
+          type="file"
+          name="photo"
+          id="customFile"
+          onChange={handleFileInput}
+          accept=".jpg, .png"
+          className="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer"
+          disabled={isUploading}
+        />
+        
+        <label
+          htmlFor="customFile"
+          className="absolute top-0 left-0 w-full h-full flex items-center justify-center px-3 text-sm leading-6 overflow-hidden bg-blue-100 text-blue-900 font-semibold rounded-lg truncate cursor-pointer"
+        >
+          {isUploading ? (
+            <div className="flex items-center space-x-2">
+              <HashLoader size={20} color="#1a365d" />
+              <span>Uploading...</span>
             </div>
+          ) : (
+            'Upload Photo'
+          )}
+        </label>
+      </div>
         </div>
 
         <div className=' mt-7'>
-            <button type='submit' onClick={updateProfileHandler} className=' bg-primaryColor text-white text-[18px] leading-[30px] w-full py-3 rounded-lg '>{loading?<HashLoader size={25}/> : 'Update Profile'}</button>
+            <button type='submit' onClick={updateProfileHandler} disabled={!isUploadComplete} className=' bg-primaryColor text-white text-[18px] leading-[30px] w-full py-3 rounded-lg '>{loading?<HashLoader size={25}/> : 'Update Profile'}</button>
         </div>
 
 
