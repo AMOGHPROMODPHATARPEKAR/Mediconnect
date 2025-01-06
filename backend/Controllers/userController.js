@@ -7,17 +7,8 @@ import bcrypt from 'bcryptjs'
 export const updateUser = async(req,res)=>{
 
     const id =  req.params.id;
-
-    const {role} = req.body;
-    if(role)
-        {
-            return res.status(400)
-                .json({
-                    status:false,
-                    message:"Cannot Update Role",
-                    
-                })
-        }
+    
+    
 
     try {
 

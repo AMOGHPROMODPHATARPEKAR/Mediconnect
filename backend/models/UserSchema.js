@@ -15,6 +15,13 @@ const UserSchema = new mongoose.Schema({
   gender: { type: String, enum: ["male", "female", "other"] },
   bloodType: { type: String },
   appointments: [{ type: mongoose.Types.ObjectId, ref: "Appointment" }],
+  allergies:{
+    type:Array
+  },
+  records:{
+    type:Array
+  }
+
 });
 
 export default mongoose.model("User", UserSchema);

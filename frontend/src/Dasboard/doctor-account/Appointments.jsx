@@ -20,9 +20,10 @@ import {
   IconButton,
   CircularProgress,
   Box,
-  Typography
+  Typography,
+  Tooltip
 } from '@mui/material';
-import { Upload, X } from 'lucide-react';
+import { Upload, X,FileText  } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const Appointments = ({ appointments }) => {
@@ -101,6 +102,8 @@ const Appointments = ({ appointments }) => {
             <TableRow>
               <TableCell>Name</TableCell>
               <TableCell>Gender</TableCell>
+              <TableCell>Medical Info</TableCell>
+              <TableCell>Documents</TableCell>
               <TableCell>Payment</TableCell>
               <TableCell>Price</TableCell>
               <TableCell>Booked On</TableCell>
@@ -121,6 +124,47 @@ const Appointments = ({ appointments }) => {
                   </div>
                 </TableCell>
                 <TableCell>{item.user?.gender}</TableCell>
+                <TableCell>
+                  <div>
+                    <div><strong>Blood Type:</strong> {item.user?.bloodType || 'N/A'}</div>
+                    <div>
+                      <strong>Allergies:</strong>
+                      <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginTop: '4px' }}>
+                        {item.user?.allergies?.length > 0 ? (
+                          item.user.allergies.map((allergy, index) => (
+                            <Chip 
+                              key={index}
+                              label={allergy}
+                              size="small"
+                              color="warning"
+                              sx={{ margin: '2px' }}
+                            />
+                          ))
+                        ) : (
+                          'None reported'
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  {item.user?.records?.length > 0 ? (
+                    item.user.records.map((record, index) => (
+                      <Tooltip key={index} title={record.name || `View Record ${index + 1}`}>
+                        <IconButton 
+                          size="small" 
+                          href={record.url} 
+                          target="_blank"
+                          sx={{ mr: 1 }}
+                        >
+                          <FileText size={20} />
+                        </IconButton>
+                      </Tooltip>
+                    ))
+                  ) : (
+                    'No records'
+                  )}
+                </TableCell>
                 <TableCell>
                   <Chip 
                     label={item.isPaid ? "Paid" : "Unpaid"}
