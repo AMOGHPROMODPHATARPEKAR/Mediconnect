@@ -8,6 +8,7 @@ import userRoute from './Routes/user.js'
 import doctorRoute from './Routes/doctor.js'
 import reviewRoute from './Routes/review.js'
 import bookingRoute from './Routes/booking.js'
+import ipfsRoute from './Routes/ipfs.js'
 import { Resend } from 'resend';
 import axios from 'axios'
 
@@ -46,7 +47,7 @@ const connectDB = async()=>{
             useNewUrlParser:true,
             useUnifiedTopology:true
         })
-
+ 
         console.log("MongoDb database is connected")
 
     } catch (error) {
@@ -72,6 +73,7 @@ app.use('/api/v1/user',userRoute);
 app.use('/api/v1/doctor',doctorRoute);
 app.use('/api/v1/review',reviewRoute);
 app.use('/api/v1/bookings',bookingRoute);
+app.use('/api/v1/ipfs',ipfsRoute);
 
 
 //calendar
@@ -184,7 +186,9 @@ app.post('/schedule_event', async (req, res) => {
   }
 });
 
-
+export const PINATA_APIKEY = process.env.PINATA_APIKEY;
+console.log(PINATA_APIKEY)
+export const PINATA_SECRETKEY = process.env.PINATA_SECRETKEY;
 
 app.listen(PORT, () => {
     connectDB();
