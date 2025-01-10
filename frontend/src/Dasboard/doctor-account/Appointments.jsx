@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { formateDate } from '../../utils/formateDate';
-import uploadToCloudinary from '../../utils/uploadToCloudinary'
 import { 
   Table, 
   TableBody, 
@@ -21,10 +20,12 @@ import {
   CircularProgress,
   Box,
   Typography,
-  Tooltip
+  Tooltip,
+  Modal
 } from '@mui/material';
-import { Upload, X,FileText  } from 'lucide-react';
+import { Upload, X, FileText, Eye } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import {token} from '../../config.js'
 
 const Appointments = ({ appointments }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -33,10 +34,43 @@ const Appointments = ({ appointments }) => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [fileUrl, setFileUrl] = useState('');
   const [uploading, setUploading] = useState(false);
+  const [imageDialogOpen, setImageDialogOpen] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [loadingImage, setLoadingImage] = useState(false);
 
   const navigate = useNavigate()
 
   const activeAppointments = appointments?.filter(item => item.status !== 'completed') || [];
+
+  const handleViewRecord = async (record,id) => {
+    setLoadingImage(true);
+    try {
+      const response = await fetch(`/api/v1/ipfs/getImage?userId=${id}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          ipfsHash: record.ipfsHash
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch image');
+      }
+
+      const data = await response.json();
+      setSelectedImage(`data:image/jpeg;base64,${data.depcryptedImage}`);
+      setImageDialogOpen(true);
+    } catch (error) {
+      console.error('Error fetching image:', error);
+    } finally {
+      setLoadingImage(false);
+    }
+  };
+
+
 
   const handleFileSelect = (event) => {
     const file = event.target.files[0];
@@ -60,17 +94,17 @@ const Appointments = ({ appointments }) => {
   };
 
   const handleComplete = async (appointmentId) => {
-    
     try {
       const response = await fetch(`/api/v1/bookings/${appointmentId}/complete`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
         },
         body: JSON.stringify({ 
           status: 'completed', 
           remarks,
-          reportUrl: fileUrl // Include the file URL in the request
+          reportUrl: fileUrl
         }),
       });
 
@@ -78,7 +112,6 @@ const Appointments = ({ appointments }) => {
         setIsDialogOpen(false);
         setRemarks('');
         setFileUrl('');
-        // Refresh appointments data here
       }
 
       navigate('/doctor/profile/me')
@@ -153,11 +186,11 @@ const Appointments = ({ appointments }) => {
                       <Tooltip key={index} title={record.name || `View Record ${index + 1}`}>
                         <IconButton 
                           size="small" 
-                          href={record.url} 
-                          target="_blank"
+                          onClick={() => handleViewRecord(record,item.user._id)}
+                          disabled={loadingImage}
                           sx={{ mr: 1 }}
                         >
-                          <FileText size={20} />
+                          {loadingImage ? <CircularProgress size={20} /> : <Eye size={20} />}
                         </IconButton>
                       </Tooltip>
                     ))
@@ -203,15 +236,14 @@ const Appointments = ({ appointments }) => {
         </Table>
       </TableContainer>
 
+      {/* Appointment Completion Dialog */}
       <Dialog 
         open={isDialogOpen} 
         onClose={handleCloseDialog}
         maxWidth="sm"
         fullWidth
       >
-        <DialogTitle>
-          Complete Appointment
-        </DialogTitle>
+        <DialogTitle>Complete Appointment</DialogTitle>
         <DialogContent>
           <p style={{ marginBottom: '1rem' }}>
             Enter your remarks about the appointment for {selectedAppointment?.user?.name}
@@ -280,10 +312,7 @@ const Appointments = ({ appointments }) => {
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button 
-            onClick={handleCloseDialog}
-            color="inherit"
-          >
+          <Button onClick={handleCloseDialog} color="inherit">
             Cancel
           </Button>
           <Button 
@@ -293,6 +322,40 @@ const Appointments = ({ appointments }) => {
             disabled={!remarks.trim() || (!fileUrl && selectedFile)}
           >
             Complete Appointment
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Image Viewing Dialog */}
+      <Dialog
+        open={imageDialogOpen}
+        onClose={() => {
+          setImageDialogOpen(false);
+          setSelectedImage(null);
+        }}
+        maxWidth="md"
+        fullWidth
+      >
+        <DialogTitle>View Document</DialogTitle>
+        <DialogContent>
+          {selectedImage && (
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+              <img 
+                src={selectedImage} 
+                alt="Medical Record" 
+                style={{ maxWidth: '100%', maxHeight: '70vh' }}
+              />
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button 
+            onClick={() => {
+              setImageDialogOpen(false);
+              setSelectedImage(null);
+            }}
+          >
+            Close
           </Button>
         </DialogActions>
       </Dialog>

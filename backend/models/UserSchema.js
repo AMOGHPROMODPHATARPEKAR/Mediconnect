@@ -20,7 +20,11 @@ const UserSchema = new mongoose.Schema({
   },
   records:{
     type:Array
-  }
+  },
+  encryptionKey:{
+    type:Buffer,
+    default:null
+}
 
 });
 

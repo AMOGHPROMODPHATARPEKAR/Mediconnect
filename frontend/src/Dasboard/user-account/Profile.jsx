@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import uploadToCloudinary from '../../utils/uploadToCloudinary.js'
 import { toast } from 'react-toastify'
 import HashLoader from 'react-spinners/HashLoader.js'
 import {token} from '../../config.js'
@@ -59,18 +58,35 @@ const Profile = ({user}) => {
 
     setUploadingRecord(true)
     try {
-      const data = await uploadToCloudinary(file)
-      if (!data) throw new Error("Upload failed")
+      const formDataUpload = new FormData()
+      formDataUpload.append('file', file)
+
+      const response = await fetch('/api/v1/ipfs/uploadImage', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        body: formDataUpload
+      })
+
+      const data = await response.json()
       
+      if (!response.ok) {
+        throw new Error(data.message || 'Upload failed')
+      }
+      console.log(data)
       setFormData(prev => ({
         ...prev,
         records: [...prev.records, {
-          url: data.url,
-          name: file.name
+          url: `https://gateway.pinata.cloud/ipfs/${data.ipfsHash}`,
+          name: file.name,
+          ipfsHash: data.ipfsHash
         }]
       }))
+
+      toast.success(data.message)
     } catch (error) {
-      toast.error("Error uploading record")
+      toast.error(error.message || "Error uploading record")
     } finally {
       setUploadingRecord(false)
     }

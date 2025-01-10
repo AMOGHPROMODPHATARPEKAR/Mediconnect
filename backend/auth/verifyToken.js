@@ -42,7 +42,7 @@ export const authenicate = async(req,res,next)=>{
     }
 
 }
-
+//authorization
 export const restrict = roles => async(req,res,next)=>{
 
     // console.log("role",req.role,roles)
