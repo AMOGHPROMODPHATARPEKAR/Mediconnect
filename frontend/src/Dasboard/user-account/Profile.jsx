@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import HashLoader from 'react-spinners/HashLoader.js'
 import {token} from '../../config.js'
+import uploadToCloudinary from '../../utils/uploadToCloudinary.js'
 
 const Profile = ({user}) => {
   const [loading, setLoading] = useState(false)
@@ -100,13 +101,18 @@ const Profile = ({user}) => {
   const handleFileInput = async(e) => {
     const file = e.target.files[0]
     if (!file) return
-
+    setUploadingRecord(true)
     try {
+      console.log(file,uploadingRecord)
       const data = await uploadToCloudinary(file)
+      console.log("jfjdS",data)
       if (!data) throw new Error("Upload failed")
       setFormData({...formData, photo: data.url})
     } catch (error) {
       toast.error("Error uploading photo")
+      console.log(error)
+    }finally {
+      setUploadingRecord(false)
     }
   }
 

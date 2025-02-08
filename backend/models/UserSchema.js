@@ -6,7 +6,7 @@ const UserSchema = new mongoose.Schema({
   password: { type: String, required: true },
   name: { type: String, required: true },
   phone: { type: Number },
-  photo: { type: String },
+  photo: { type: String , default: "https://res.cloudinary.com/dupiobvsv/image/upload/v1739006251/user_empty_iohnke.jpg"},
   role: {
     type: String,
     enum: ["patient", "admin"],
