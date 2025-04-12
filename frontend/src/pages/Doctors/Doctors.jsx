@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import DoctorCard from '../../components/Doctors/DoctorCard';
 import Testimonial from '../../components/Testimonial/Testimonial';
 import useFetchData from '../../hooks/useFetchData';
@@ -73,6 +73,75 @@ const LANGUAGES = {
         languages: 'ಭಾಷೆಗಳು'
       }
     }
+  },
+  'te': {
+    name: 'తెలుగు',
+    code: 'te-IN',
+    translations: {
+      findDoctor: 'వైద్యుడిని కనుగొనండి',
+      searchPlaceholder: 'పేరు, స్పెషలైజేషన్ లేదా స్థానం ద్వారా శోధించండి',
+      searchButton: 'శోధించు',
+      patientSays: 'మా రోగి ఏమి చెబుతున్నారు',
+      genuineOpinions: 'నిజమైన అభిప్రాయాలు',
+      selectLanguage: 'భాష ఎంచుకోండి',
+      startVoice: 'వాయిస్ శోధన ప్రారంభించండి',
+      stopVoice: 'వాయిస్ శోధన ఆపండి',
+      listening: 'వింటున్నాము...',
+      noResults: 'వైద్యులు ఎవరూ కనుగొనబడలేదు',
+      translating: 'అనువదిస్తోంది...',
+      error: 'అనువాద లోపం',
+      filters: {
+        location: 'స్థానం',
+        specialization: 'స్పెషలైజేషన్',
+        languages: 'భాషలు'
+      }
+    }
+  },
+  'ta': {
+    name: 'தமிழ்',
+    code: 'ta-IN',
+    translations: {
+      findDoctor: 'மருத்துவரைக் கண்டுபிடி',
+      searchPlaceholder: 'பெயர், சிறப்பு அல்லது இடத்தால் தேடுங்கள்',
+      searchButton: 'தேடு',
+      patientSays: 'எங்கள் நோயாளி என்ன சொல்கிறார்',
+      genuineOpinions: 'உண்மையான கருத்துக்கள்',
+      selectLanguage: 'மொழியை தேர்ந்தெடுக்கவும்',
+      startVoice: 'குரல் தேடலைத் தொடங்கு',
+      stopVoice: 'குரல் தேடலை நிறுத்து',
+      listening: 'கேட்கிறேன்...',
+      noResults: 'மருத்துவர்கள் யாரும் காணப்படவில்லை',
+      translating: 'மொழிபெயர்க்கிறது...',
+      error: 'மொழிபெயர்ப்பு பிழை',
+      filters: {
+        location: 'இடம்',
+        specialization: 'சிறப்பு',
+        languages: 'மொழிகள்'
+      }
+    }
+  },
+  'fr': {
+    name: 'Français',
+    code: 'fr-FR',
+    translations: {
+      findDoctor: 'Trouver un médecin',
+      searchPlaceholder: 'Rechercher par nom, spécialisation ou lieu',
+      searchButton: 'Rechercher',
+      patientSays: 'Ce que disent nos patients',
+      genuineOpinions: 'Avis authentiques',
+      selectLanguage: 'Sélectionner la langue',
+      startVoice: 'Démarrer la recherche vocale',
+      stopVoice: 'Arrêter la recherche vocale',
+      listening: 'Écoute en cours...',
+      noResults: 'Aucun médecin trouvé',
+      translating: 'Traduction en cours...',
+      error: 'Erreur de traduction',
+      filters: {
+        location: 'Lieu',
+        specialization: 'Spécialisation',
+        languages: 'Langues'
+      }
+    }
   }
 };
 
@@ -90,18 +159,19 @@ const translateText = async (text, fromLang, toLang) => {
         },
         body: JSON.stringify({
           text,
-          source: fromLang === 'en' ? 'en' : fromLang,
-          target_language: toLang === 'en' ? 'en' : toLang,
-          
+          source: fromLang,
+          target_language: toLang
         })
       }
     );
 
     if (!response.ok) throw new Error('Translation failed');
-
+    
     const data = await response.json();
-    console.log("dfd",data.translated_text)
+
+    console.log("Translated text:", data.translated_text);
     return data.translated_text;
+
   } catch (error) {
     console.error('Translation error:', error);
     throw error;
@@ -121,6 +191,15 @@ const Doctors = () => {
     specialization: '',
     languages: []
   });
+  
+  // Store the current transcript in progress
+  const [currentTranscript, setCurrentTranscript] = useState('');
+  
+  // Create a ref to track if recognition is restarting
+  const isRestartingRef = useRef(false);
+  
+  // Keep track of last search query to prevent unnecessary translations
+  const lastSearchRef = useRef('');
 
   const { data: allDoctors, loading, error } = useFetchData(`${BASE_URL}/doctor`);
 
@@ -134,10 +213,26 @@ const Doctors = () => {
     if (searchQuery.trim()) {
       try {
         setIsTranslating(true);
-        // Translate search query to English for searching
-        const translatedQuery = await translateText(searchQuery, selectedLanguage, 'en');
-        const searchTerms = translatedQuery.toLowerCase().split(' ').filter(term => term);
-        console.log("trs",translatedQuery,searchTerms )
+        
+        // Skip unnecessary translation if query hasn't changed
+        if (searchQuery.trim() === lastSearchRef.current) {
+          setIsTranslating(false);
+          return filtered.filter(doctor => doctor.isApproved === "approved");
+        }
+        
+        lastSearchRef.current = searchQuery.trim();
+        console.log('in the searchDoctors function:', searchQuery,selectedLanguage);
+        // Translate search query to English for searching if not already in English
+        let translatedData= searchQuery;
+        if (selectedLanguage !== 'en') {
+          console.log('Translating query:', searchQuery, selectedLanguage);
+          const data = await translateText(searchQuery, selectedLanguage, 'en');
+          console.log('Translated query:', data);
+          // console.log(`Translated query from ${selectedLanguage} to English:`, translatedQuery);
+        }
+        
+        const searchTerms = translatedData?.translated_text.toLowerCase().split(' ').filter(term => term);
+        console.log('Search terms:', searchTerms);
         filtered = filtered.filter(doctor => {
           const searchableFields = [
             doctor.name,
@@ -148,7 +243,7 @@ const Doctors = () => {
             ...(doctor.languages || [])
           ].map(field => (field || '').toString().toLowerCase());
 
-          return searchTerms.every(term =>
+          return searchTerms.some(term =>
             searchableFields.some(field => field.includes(term))
           );
         });
@@ -163,7 +258,10 @@ const Doctors = () => {
     // Apply filters with translation
     if (filters.location) {
       try {
-        const translatedLocation = await translateText(filters.location, selectedLanguage, 'en');
+        let translatedLocation = filters.location;
+        if (selectedLanguage !== 'en') {
+          translatedLocation = await translateText(filters.location, selectedLanguage, 'en');
+        }
         filtered = filtered.filter(doctor => 
           doctor.location?.toLowerCase().includes(translatedLocation.toLowerCase())
         );
@@ -174,7 +272,10 @@ const Doctors = () => {
 
     if (filters.specialization) {
       try {
-        const translatedSpecialization = await translateText(filters.specialization, selectedLanguage, 'en');
+        let translatedSpecialization = filters.specialization;
+        if (selectedLanguage !== 'en') {
+          translatedSpecialization = await translateText(filters.specialization, selectedLanguage, 'en');
+        }
         filtered = filtered.filter(doctor => 
           doctor.specialization?.toLowerCase().includes(translatedSpecialization.toLowerCase())
         );
@@ -194,6 +295,17 @@ const Doctors = () => {
     return filtered.filter(doctor => doctor.isApproved === "approved");
   };
 
+  // Reset query when language changes
+  useEffect(() => {
+    setQuery('');
+    lastSearchRef.current = '';
+    
+    // Reset filtered doctors to show all approved doctors
+    if (allDoctors) {
+      setFilteredDoctors(allDoctors.filter(doctor => doctor.isApproved === "approved"));
+    }
+  }, [selectedLanguage]);
+
   // Debounced effect for search
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -205,21 +317,54 @@ const Doctors = () => {
     return () => clearTimeout(timeoutId);
   }, [query, allDoctors, filters, selectedLanguage]);
 
+  // Clean up recognition on unmount
+  useEffect(() => {
+    return () => {
+      if (recognition) {
+        recognition.stop();
+      }
+    };
+  }, [recognition]);
+
   // Speech recognition setup
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (SpeechRecognition) {
+        // Stop any existing recognition
+        if (recognition) {
+          recognition.stop();
+          setIsListening(false);
+        }
+
         const newRecognition = new SpeechRecognition();
-        newRecognition.continuous = true;
+        newRecognition.continuous = false; // Change to false to get complete phrases
         newRecognition.interimResults = true;
         newRecognition.lang = LANGUAGES[selectedLanguage].code;
 
+        newRecognition.onstart = () => {
+          setIsListening(true);
+          setCurrentTranscript(''); // Reset transcript on start
+        };
+
         newRecognition.onresult = (event) => {
+          // Get latest transcript
           const transcript = Array.from(event.results)
             .map(result => result[0].transcript)
-            .join('');
-          setQuery(prev => prev + ' ' + transcript);
+            .join(' ');
+            
+          // Update the current transcript
+          setCurrentTranscript(transcript);
+          
+          // If it's final, update the query
+          if (event.results[0].isFinal) {
+            setQuery(prevQuery => {
+              // If query is empty, just use the transcript
+              // Otherwise, append with a space
+              return prevQuery.trim() ? `${prevQuery.trim()} ${transcript.trim()}` : transcript.trim();
+            });
+            setCurrentTranscript('');
+          }
         };
 
         newRecognition.onerror = (event) => {
@@ -229,6 +374,16 @@ const Doctors = () => {
 
         newRecognition.onend = () => {
           setIsListening(false);
+          
+          // If we need to restart, do it now
+          if (isRestartingRef.current && !isListening) {
+            isRestartingRef.current = false;
+            
+            // Small delay to prevent rapid restarts
+            setTimeout(() => {
+              newRecognition.start();
+            }, 100);
+          }
         };
 
         setRecognition(newRecognition);
@@ -243,13 +398,14 @@ const Doctors = () => {
       recognition.stop();
       setIsListening(false);
     } else {
+      // Clear current transcript when starting new session
+      setCurrentTranscript('');
       recognition.start();
-      setIsListening(true);
     }
   };
 
-  // console.log(LANGUAGES[selectedLanguage])
   const texts = LANGUAGES[selectedLanguage].translations;
+  
   return (
     <>
       <section className='bg-[#fff9ea]'>
@@ -274,7 +430,7 @@ const Doctors = () => {
               type="search"
               className="py-4 pl-4 pr-2 bg-transparent w-full focus:outline-none cursor-pointer placeholder:text-textColor"
               placeholder={texts.searchPlaceholder}
-              value={query}
+              value={isListening ? `${query} ${currentTranscript}` : query}
               onChange={e => setQuery(e.target.value)}
             />
             {isTranslating && (
@@ -333,15 +489,7 @@ const Doctors = () => {
         </div>
       </section>
 
-      <section>
-        <div className='container'>
-          <div className='xl:w-[470px] mx-auto'>
-            <h2 className='heading text-center'>{texts.patientSays}</h2>
-            <p className='text_para text-center'>{texts.genuineOpinions}</p>
-          </div>
-          <Testimonial language={selectedLanguage} />
-        </div>
-      </section>
+      
     </>
   );
 };

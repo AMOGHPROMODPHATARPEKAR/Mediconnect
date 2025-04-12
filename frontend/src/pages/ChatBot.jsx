@@ -11,9 +11,9 @@ const LANGUAGES = {
   'en': { name: 'English', code: 'en-US' },
   'hi': { name: 'हिंदी', code: 'hi-IN' },
   'kn': { name: 'ಕನ್ನಡ', code: 'kn-IN' },
-  'es': { name: 'Español', code: 'es-ES' },
   'fr': { name: 'Français', code: 'fr-FR' },
-  'de': { name: 'Deutsch', code: 'de-DE' }
+  'te': { name: 'తెలుగు', code: 'te-IN' },
+  'ta': { name: 'தமிழ்', code: 'ta-IN' }
 };
 
 const getSystemMessage = (lang) => ({
@@ -81,8 +81,55 @@ const INTERFACE_TEXT = {
       ticketPrice: 'ಟಿಕೆಟ್ ದರ',
       rating: 'ಸರಾಸರಿ ರೇಟಿಂಗ್'
     }
+  },
+  'te': {
+    title: 'మెడికనెక్ట్ బాట్',
+    messageLabel: 'మీ సందేశాన్ని టైప్ చేయండి...',
+    sendButton: 'పంపించండి',
+    voiceButton: 'ధ్వని',
+    listeningText: 'వినేస్తున్నాను...',
+    languageSelect: 'భాషను ఎంచుకోండి',
+    predictedSpecialists: 'అంచనా నిపుణులు',
+    doctorDetails: {
+      name: 'పేరు',
+      specialization: 'ప్రత్యేకత',
+      location: 'ప్రాంతం',
+      ticketPrice: 'టికెట్ ధర',
+      rating: 'సగటు రేటింగ్'
+    }
+  },
+  'ta': {
+    title: 'மெடிகனெக்ட் போட்',
+    messageLabel: 'உங்கள் செய்தியை டைப் செய்யவும்...',
+    sendButton: 'அனுப்பு',
+    voiceButton: 'குரல்',
+    listeningText: 'கேட்கின்றேன்...',
+    languageSelect: 'மொழியைத் தேர்ந்தெடுக்கவும்',
+    predictedSpecialists: 'முன்னறியப்பட்ட நிபுணர்கள்',
+    doctorDetails: {
+      name: 'பெயர்',
+      specialization: 'துறை',
+      location: 'இடம்',
+      ticketPrice: 'டிக்கெட் விலை',
+      rating: 'சராசரி மதிப்பீடு'
+    }
+  },
+  'fr': {
+    title: 'MediConnectBot',
+    messageLabel: 'Tapez votre message...',
+    sendButton: 'Envoyer',
+    voiceButton: 'Voix',
+    listeningText: 'Écoute...',
+    languageSelect: 'Choisir la langue',
+    predictedSpecialists: 'Spécialistes Prévus',
+    doctorDetails: {
+      name: 'Nom',
+      specialization: 'Spécialité',
+      location: 'Lieu',
+      ticketPrice: 'Prix du billet',
+      rating: 'Note moyenne'
+    }
   }
-  // Add more languages as needed
 };
 
 const ChatBot = () => {

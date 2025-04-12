@@ -67,6 +67,19 @@ const Header = () => {
       display:'Chats',
       active:!status
     }
+    ,
+    {
+      path:"/chatbot",
+      display:'ChatBot',
+      active:status
+    }
+    
+    ,
+    {
+      path:"/report",
+      display:'Report',
+      active:!status
+    }
     
   ]
 

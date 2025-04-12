@@ -19,6 +19,7 @@ import DoctorChat from '../pages/Doctors/DoctorChat.jsx'
 import ChatBot from '../pages/ChatBot.jsx'
 import ForgetPassword from '../components/ForgetPassword.jsx'
 import ChangePassword from '../components/ChangePassword.jsx'
+import Report from '../pages/Report.jsx'
 
 
 const Routers = () => {
@@ -37,6 +38,7 @@ const Routers = () => {
     <Route  path='/chats' element={<DoctorChat/>} />
     <Route  path='/chat/:id' element={<Chat/>} />
     <Route  path='/chatbot' element={<ChatBot/>} />
+    <Route  path='/report' element={<Report/>} />
     <Route  path='/forgot' element={<ForgetPassword/>} />
     <Route  path='/changePassword/:id' element={<ChangePassword/>} />
     <Route path='/user/profile/me' element={<ProtectedRoute allowedRoles={['patient']}><MyAccount/></ProtectedRoute> }/>

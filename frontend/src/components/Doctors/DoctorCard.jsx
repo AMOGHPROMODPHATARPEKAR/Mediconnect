@@ -56,57 +56,10 @@ const DoctorCard = ({ doctor, booking, bookingId, language = 'en' }) => {
     languages: doctorLanguages
   } = doctor;
   
-  const [translatedName, setTranslatedName] = useState(name);
-  const [translatedSpecialization, setTranslatedSpecialization] = useState(specialization);
+  
   const navigate = useNavigate();
   const texts = TRANSLATIONS[language] || TRANSLATIONS.en;
 
-  const translate = async (text) => {
-    try {
-      const response = await fetch(
-        `http://127.0.0.1:5000/translate`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            text,
-            target_language: language,
-          })
-        }
-      );
-
-      if (!response.ok) throw new Error('Translation failed');
-
-      const data = await response.json();
-      console.log("tt",data.translated_text)
-      return data.translated_text;
-
-    } catch (error) {
-      console.error('Translation error:', error);
-      throw error;
-    }
-  };
-
-  useEffect(() => {
-    const translateFields = async () => {
-      try {
-        const [translatedNameResult, translatedSpecResult] = await Promise.all([
-          translate(name),
-          translate(specialization)
-        ]);
-        setTranslatedName(translatedNameResult);
-        setTranslatedSpecialization(translatedSpecResult);
-      } catch (error) {
-        console.error('Translation error:', error);
-      }
-    };
-
-    if (language !== 'en') {
-      translateFields();
-    }
-  }, [name, specialization, language]);
 
   const handleDelete = async () => {
     try {
@@ -137,16 +90,16 @@ const DoctorCard = ({ doctor, booking, bookingId, language = 'en' }) => {
   return (
     <div className='p-3 lg:p-5'>
       <div>
-        <img src={photo} alt={translatedName} className="w-full rounded-lg" />
+        <img src={photo} alt={name} className="w-full rounded-lg" />
       </div>
 
       <h2 className='text-[18px] leading-[30px] text-headingColor lg:text-[26px] lg:leading-9 font-[700] left-3 lg:mt-5'>
-        {translatedName}
+        {name}
       </h2>
 
       <div className='mt-2 lg:mt-4 flex items-center justify-between'>
         <span className='bg-[#CCF0F3] text-irisBlueColor py-1 px-2 lg:py-2 lg:px-6 text-[12px] leading-4 lg:text-[16px] lg:leading-7 font-semibold rounded'>
-          {translatedSpecialization}
+          {specialization}
         </span>
 
         <div className='flex items-center gap-[6px]'>
