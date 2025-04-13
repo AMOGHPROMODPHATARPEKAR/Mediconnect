@@ -18,29 +18,36 @@ import DoctorList from '../components/Doctors/DoctorList';
 import FaqList from '../components/Faq/FaqList';
 import Testimonial from '../components/Testimonial/Testimonial';
 import { authContext } from '../context/AuthContext';
+import { LanguageContext } from '../context/LanguageContext';
+import LanguageSelector from '../components/LanguageSelector';
 
 const Home = () => {
   const { role } = useContext(authContext);
+  const { language, translations } = useContext(LanguageContext);
   console.log("user", role);
+  console.log("language", language);
+  console.log("translations", translations);
+
+  const t = translations;
 
   const renderPatientHome = () => (
     <>
       <section className='hero_section pt-[60px] 2xl:h-[800px]'>
-      <Link to='/chatbot'>
-        <div className='fixed right-[50px] bottom-[30px]'>
+        <Link to='/chatbot'>
+          <div className='fixed right-[50px] bottom-[30px]'>
             <BsChatFill className='cursor-pointer' size={70} fill='green' />
-          <p className='relative right-[-2px] bottom-[48px] text-white cursor-pointer'>Chatbot</p>
-        </div>
+            <p className='relative right-[-2px] bottom-[48px] text-white cursor-pointer'>{t.chatbot}</p>
+          </div>
         </Link>
         <div className='container'>
           <div className='flex flex-col lg:flex-row gap-[90px] items-center justify-between'>
             <div>
               <div className='lg:w-[570px]'>
-                <h1 className='text-[36px] leading-[46px] text-headingColor font-[800] md:text-[60px] md:leading-[70px]'>We help patients live a healthy, longer life.</h1>
-                <p className='text_para'>Welcome to our cutting-edge Doctor Appointment Booking System! Our platform revolutionizes the way you schedule medical appointments, providing a seamless and efficient experience for both patients and healthcare providers.</p>
+                <h1 className='text-[36px] leading-[46px] text-headingColor font-[800] md:text-[60px] md:leading-[70px]'>{t.heroHeading}</h1>
+                <p className='text_para'>{t.heroSubHeading}</p>
                 {role === 'patient' &&
                   <Link to='/doctors'>
-                    <button className='btn'>Request an Appointment</button>
+                    <button className='btn'>{t.requestAppointment}</button>
                   </Link>
                 }
               </div>
@@ -50,21 +57,21 @@ const Home = () => {
                     30+
                   </h2>
                   <span className='w-[100px] h-2 bg-yellowColor rounded-full block mt-[-14px]'></span>
-                  <p className='text_para'>Years of Experience</p>
+                  <p className='text_para'>{t.yearsOfExperience}</p>
                 </div>
                 <div>
                   <h2 className='text-[36px] leading-[56px] lg:text-[44px] lg:leading-[54px] font-[700] text-headingColor'>
                     15+
                   </h2>
                   <span className='w-[100px] h-2 bg-purpleColor rounded-full block mt-[-14px]'></span>
-                  <p className='text_para'>Client Location</p>
+                  <p className='text_para'>{t.clientLocation}</p>
                 </div>
                 <div>
                   <h2 className='text-[36px] leading-[56px] lg:text-[44px] lg:leading-[54px] font-[700] text-headingColor'>
                     100%
                   </h2>
                   <span className='w-[100px] h-2 bg-irisBlueColor rounded-full block mt-[-14px]'></span>
-                  <p className='text_para'>Patient Satisfaction</p>
+                  <p className='text_para'>{t.patientSatisfaction}</p>
                 </div>
               </div>
             </div>
@@ -84,8 +91,8 @@ const Home = () => {
       <section>
         <div className='container'>
           <div className='lg:w-[470px] mx-auto'>
-            <h2 className='heading text-center'>Providing the best medical services</h2>
-            <p className='text_para text-center'>World class care for everyone. Our health system offers unmatched, expert health care</p>
+            <h2 className='heading text-center'>{t.bestMedicalServices}</h2>
+            <p className='text_para text-center'>{t.worldClassCare}</p>
           </div>
           <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-[30px] mt-[30px]'>
             <div className='py-[30px] px-5'>
@@ -93,8 +100,8 @@ const Home = () => {
                 <img src={icon01} alt="" />
               </div>
               <div className='mt-[30px]'>
-                <h2 className='text-[26px] leading-9 text-headingColor font-[700] text-center'>Find a Doctor</h2>
-                <p className='text-[16px] leading-7 text-textColor font-[400] mt-4 text-center'>Providing unparalleled care for all, our health system delivers expert healthcare from the lab to the clinic.</p>
+                <h2 className='text-[26px] leading-9 text-headingColor font-[700] text-center'>{t.findDoctor}</h2>
+                <p className='text-[16px] leading-7 text-textColor font-[400] mt-4 text-center'>{t.findDoctorDesc}</p>
                 <Link to='/doctors' className='w-[44px] h-[44px] rounded-full border border-solid border-[#181A1E] mt-[30px] mx-auto flex items-center justify-center group hover:bg-primaryColor hover:border-none'>
                   <BsArrowRight className='group-hover:text-white w-6 h-5' />
                 </Link>
@@ -105,8 +112,8 @@ const Home = () => {
                 <img src={icon02} alt="" />
               </div>
               <div className='mt-[30px]'>
-                <h2 className='text-[26px] leading-9 text-headingColor font-[700] text-center'>Find a Location</h2>
-                <p className='text-[16px] leading-7 text-textColor font-[400] mt-4 text-center'>Discover Your Nearest Health Center.</p>
+                <h2 className='text-[26px] leading-9 text-headingColor font-[700] text-center'>{t.findLocation}</h2>
+                <p className='text-[16px] leading-7 text-textColor font-[400] mt-4 text-center'>{t.findLocationDesc}</p>
                 <Link to='/doctors' className='w-[44px] h-[44px] rounded-full border border-solid border-[#181A1E] mt-[30px] mx-auto flex items-center justify-center group hover:bg-primaryColor hover:border-none'>
                   <BsArrowRight className='group-hover:text-white w-6 h-5' />
                 </Link>
@@ -117,8 +124,8 @@ const Home = () => {
                 <img src={icon03} alt="" />
               </div>
               <div className='mt-[30px]'>
-                <h2 className='text-[26px] leading-9 text-headingColor font-[700] text-center'>Book Appointment</h2>
-                <p className='text-[16px] leading-7 text-textColor font-[400] mt-4 text-center'>Schedule Your Visit Today! Book an Appointment with Ease and Convenience.</p>
+                <h2 className='text-[26px] leading-9 text-headingColor font-[700] text-center'>{t.bookAppointment}</h2>
+                <p className='text-[16px] leading-7 text-textColor font-[400] mt-4 text-center'>{t.bookAppointmentDesc}</p>
                 <Link to='/doctors' className='w-[44px] h-[44px] rounded-full border border-solid border-[#181A1E] mt-[30px] mx-auto flex items-center justify-center group hover:bg-primaryColor hover:border-none'>
                   <BsArrowRight className='group-hover:text-white w-6 h-5' />
                 </Link>
@@ -133,8 +140,8 @@ const Home = () => {
       <section>
         <div className='container'>
           <div className='xl:w-[470px] mx-auto'>
-            <h2 className='heading text-center'>Our Medical services</h2>
-            <p className='text_para text-center'>Comprehensive Care, Exceptional Services: Your Health, Our Priority</p>
+            <h2 className='heading text-center'>{t.ourMedicalServices}</h2>
+            <p className='text_para text-center'>{t.comprehensiveCare}</p>
           </div>
           <ServiceList />
         </div>
@@ -144,14 +151,14 @@ const Home = () => {
         <div className='container'>
           <div className='flex items-center justify-between flex-col lg:flex-row'>
             <div className='xl:w-[670px]'>
-              <h2 className='heading'>Get Virtual treatment <br /> anytime</h2>
+              <h2 className='heading'>{t.virtualTreatmentHeading}</h2>
               <ul className='pl-4'>
-                <li className='text_para'>1. Schedule the appointment directly.</li>
-                <li className='text_para'>2. Search your physician here, and contact their office.</li>
-                <li className='text_para'>3. View our physician who are accepting patients.</li>
+                <li className='text_para'>1. {t.virtualStep1}</li>
+                <li className='text_para'>2. {t.virtualStep2}</li>
+                <li className='text_para'>3. {t.virtualStep3}</li>
               </ul>
               <Link to='/'>
-                <button className='btn'>Learn more</button>
+                <button className='btn'>{t.learnMore}</button>
               </Link>
             </div>
             <div className='relative z-10 xl:w-[770px] flex justify-end mt-[50px] lg:mt-0'>
@@ -166,7 +173,7 @@ const Home = () => {
                     <img src={videoIcon} alt="" />
                   </span>
                 </div>
-                <div className='w-[65px] lg:w-[96px] bg-[#CCF0F3] py-1 px-2 lg:py-[6px] lg:px-[10px] text-[8px] leading-[8px] lg:text-[12px] lg:leading-4 text-irisBlueColor font-[500] mt-2 lg:mt-4 rounded-full'>Consultation</div>
+                <div className='w-[65px] lg:w-[96px] bg-[#CCF0F3] py-1 px-2 lg:py-[6px] lg:px-[10px] text-[8px] leading-[8px] lg:text-[12px] lg:leading-4 text-irisBlueColor font-[500] mt-2 lg:mt-4 rounded-full'>{t.consultation}</div>
                 <div className='flex items-center gap-[6px] lg:gap-[10px] mt-2 lg:mt-[18px]'>
                   <img src={avatarIcon} alt="" />
                   <h4 className='text-[10px] leading-3 lg:text-[16px] lg:leading-[22px] font-[700] text-headingColor'>Wayne Collins</h4>
@@ -180,8 +187,8 @@ const Home = () => {
       <section>
         <div className='container'>
           <div className='xl:w-[470px] mx-auto'>
-            <h2 className='heading text-center'>Our Great Doctors</h2>
-            <p className='text_para text-center'>Comprehensive Care, Exceptional Services: Your Health, Our Priority</p>
+            <h2 className='heading text-center'>{t.ourGreatDoctors}</h2>
+            <p className='text_para text-center'>{t.comprehensiveCare}</p>
           </div>
           <DoctorList />
         </div>
@@ -194,7 +201,7 @@ const Home = () => {
               <img src={faqImg} alt="" />
             </div>
             <div className='w-full md:w-1/2'>
-              <h2>Most questions by our beloved patients</h2>
+              <h2>{t.faqHeading}</h2>
               <FaqList />
             </div>
           </div>
@@ -204,15 +211,19 @@ const Home = () => {
       <section>
         <div className='container'>
           <div className='xl:w-[470px] mx-auto'>
-            <h2 className='heading text-center'>What our patient says</h2>
-            <p className='text_para text-center'>Genuine opinions</p>
+            <h2 className='heading text-center'>{t.testimonialHeading}</h2>
+            <p className='text_para text-center'>{t.genuineOpinions}</p>
           </div>
           <Testimonial />
         </div>
       </section>
+
+      {/* Language selector component */}
+      <div className="fixed left-[20px] bottom-[30px]">
+        <LanguageSelector />
+      </div>
     </>
   );
-
   const renderDoctorHome = () => (
     <>
       <section className='hero_section pt-[60px] 2xl:h-[800px]'>

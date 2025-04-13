@@ -7,13 +7,16 @@ import 'react-toastify/dist/ReactToastify.css';
 import { BrowserRouter } from 'react-router-dom'
 import 'react-toastify/ReactToastify.css'
 import { AuthContextProvider } from './context/AuthContext.jsx'
+import { LanguageProvider } from './context/LanguageContext.jsx'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <BrowserRouter>
     <AuthContextProvider>
     <ToastContainer theme='dark' position='top-right' autoClose={3000} closeOnClick pauseOnHover={false} />
-    <App />      
+    <LanguageProvider >
+    <App />    
+    </LanguageProvider>  
     </AuthContextProvider>
     </BrowserRouter>
   </React.StrictMode>,

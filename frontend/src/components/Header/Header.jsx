@@ -3,21 +3,19 @@ import logo from '../../assets/images/logoh.png'
 import {BiMenu} from 'react-icons/bi';
 import {NavLink, Link} from 'react-router-dom';
 import { authContext } from '../../context/AuthContext.jsx';
-
-
+import { LanguageContext } from '../../context/LanguageContext.jsx';
 
 
 
 const Header = () => {
 
 
-
-
   const headerRef = useRef(null)
   const menuRef = useRef(null)
   const {dispatch} = useContext(authContext);
-
+ const {translations} = useContext(LanguageContext);
   const {user,role,token} = useContext(authContext);
+
 
   const handleLogout =()=>{
     dispatch({
@@ -39,22 +37,22 @@ const Header = () => {
   const navLinks = [
     {
       path:'/home',
-      display:'Home',
+      display:translations.navlink[0],
       active:true
     },
     {
       path:'/doctors',
-      display:'Find a Doctor',
+      display:translations.navlink[1],
       active:status
     },
     {
       path:'/services',
-      display:'Services',
+      display:translations.navlink[2],
       active:true
     },
     {
       path:'/contact',
-      display:'Contact',
+      display:translations.navlink[3],
       active:true
     },
     {
@@ -64,13 +62,13 @@ const Header = () => {
     },
     {
       path:"/chats",
-      display:'Chats',
+      display:translations.navlink[5],
       active:!status
     }
     ,
     {
       path:"/chatbot",
-      display:'ChatBot',
+      display:translations.navlink[6],
       active:status
     }
     
