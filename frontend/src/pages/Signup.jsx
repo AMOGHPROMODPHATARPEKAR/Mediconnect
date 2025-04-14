@@ -1,16 +1,109 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import signupImg from '../assets/images/signup.gif'
 import { Link, useNavigate } from 'react-router-dom'
 import uploadToCloudinary from '../utils/uploadToCloudinary.js'
 import { toast } from 'react-toastify'
 import HashLoader from 'react-spinners/HashLoader.js'
+import { LanguageContext } from '../context/LanguageContext.jsx'
 
 const Signup = () => {
 
   const [selectedFile,setSelectedFile] = useState(null)
   const [previewURL,setPreviewURL] =useState("")
   const [loading,setLoading] = useState(false)
- 
+  const {language} = useContext(LanguageContext)
+  console.log(language)
+  const translation = {
+    en:{
+      create:'Create an Account',
+      name:'Enter your Full Name',
+      email:'Enter your Email',
+      password:'Password',
+      role:'Role',
+      patient:'Patient',
+      doctor:'Doctor',
+      gender:'Gender',
+      male:'Male',
+      female:'Female',
+      others:'Others',
+      upload:'Upload Photo',
+      signup:'Sign Up',
+      signin:'Sign-In',
+      already:'Already have an account?',
+    },
+    hi:{
+      create:'एक खाता बनाएं',
+      name:'अपना पूरा नाम दर्ज करें',
+      email:'अपना ईमेल दर्ज करें',
+      password:'पासवर्ड',
+      role:'भूमिका',
+      patient:'रोगी',
+      doctor:'डॉक्टर',
+      gender:'लिंग',
+      male:'पुरुष',
+      female:'महिला',
+      others:'अन्य',
+      upload:'फोटो अपलोड करें',
+      signup:'साइन अप करें',
+      signin:'साइन इन करें',
+      already:'क्या आपके पास पहले से एक खाता है?',
+    },
+    kn:{
+      create:'ಖಾತೆ ರಚಿಸಿ',
+      name:'ನಿಮ್ಮ ಸಂಪೂರ್ಣ ಹೆಸರು ನಮೂದಿಸಿ',
+      email:'ನಿಮ್ಮ ಇಮೇಲ್ ನಮೂದಿಸಿ',
+      password:'ಪಾಸ್ವರ್ಡ್',
+      role:'ಪಾತ್ರ',
+      patient:'ರೋಗಿ', 
+      doctor:'ಡಾಕ್ಟರ್',
+      gender:'ಲಿಂಗ',
+      male:'ಪುರುಷ',
+      female:'ಸ್ತ್ರೀ',
+      others:'ಇತರರು',
+      upload:'ಚಿತ್ರವನ್ನು ಅಪ್‌ಲೋಡ್ ಮಾಡಿ',
+      signup:'ಸೈನ್ ಅಪ್ ಮಾಡಿ',
+      signin:'ಸೈನ್ ಇನ್ ಮಾಡಿ',
+      already:'ನಿಮ್ಮ ಬಳಿ ಈಗಾಗಲೇ ಖಾತೆ ಇದೆಯೇ?',
+    },
+    te:{
+      create:'ఖాతా సృష్టించండి',
+      name:'మీ పూర్తి పేరు నమోదు చేయండి',
+      email:'మీ ఇమెయిల్ నమోదు చేయండి',
+      password:'పాస్వర్డ్',
+      role:'పాత్ర',
+      patient:'రోగి',
+      gender:'లింగం',
+      male:'పురుషుడు',
+      female:'స్త్రీ',
+      others:'ఇతరులు',
+      upload:'చిత్రాన్ని అప్‌లోడ్ చేయండి',
+      signup:'సైన్ అప్ చేయండి',
+      signin:'సైన్ ఇన్ చేయండి',
+      already:'మీకు ఇప్పటికే ఖాతా ఉందా?',
+
+    },
+    fr:{
+      create:'Créer un compte',
+      name:'Entrez votre nom complet',
+      email:'Entrez votre e-mail',
+      password:'Mot de passe',
+      role:'Rôle',
+      patient:'Patient',
+      doctor:'Médecin',
+      gender:'Genre',
+      male:'Homme',
+      female:'Femme',
+      others:'Autres',
+      upload:'Télécharger la photo',
+      signup:'S’inscrire',
+      signin:'Se connecter',
+      already:'Vous avez déjà un compte?',
+    },
+
+
+  }
+  const t = translation[language]
+
   const navigate = useNavigate()
 
   const [formData,setFormData] = useState({
@@ -90,11 +183,11 @@ console.log(data)
         </div>
 
         <div className="rounded-l-lg lg:pl-16 py-10">
-          <h3 className="text-heading Color text-[22px] leading-9 font-bold mb-10">Create an <span className="text-primaryColor">Account</span></h3>
+          <h3 className="text-heading Color text-[22px] leading-9 font-bold mb-10">{t.create}</h3>
 
           <form onSubmit={submitHandler}>
           <div className=' mb-5'>
-            <input type="text" placeholder='Enter your Full Name'  
+            <input type="text" placeholder={t.name}  
             name='name' 
             value={formData.name}
             onChange={handleChange}
@@ -104,7 +197,7 @@ console.log(data)
           </div>
           <div className=' mb-5'>
             <input type="email"
-             placeholder='Enter your Email' 
+             placeholder={t.email} 
              value={formData.email}
             onChange={handleChange}
             name='email' 
@@ -114,7 +207,7 @@ console.log(data)
             </div>
           <div className=' mb-5'>
             <input type="password"
-             placeholder='Password' 
+             placeholder={t.password} 
              value={formData.password}
             onChange={handleChange}
             name='password' 
@@ -126,26 +219,26 @@ console.log(data)
 
           <div className="mb-5 flex items-center justify-between gap-3">
             <label className="text-heading Color font-bold text-[16px] leading-7">
-              Are you a:
+              {t.role}
               <select name="role" 
               value={formData.role}
               onChange={handleChange}
               className="text-textColor font-semibold text-[15px] leading-7 px-4 py-3
 focus:outline-none">
-                <option value="patient">Patient</option>
-                <option value="doctor">Doctor</option>
+                <option value="patient">{t.patient}</option>
+                <option value="doctor">{t.doctor}</option>
               </select>
             </label>
             <label className="text-headingColor font-bold text-[16px] leading-7">
-              Gender:
+              {t.gender}:
               <select name="gender" 
               value={formData.gender}
               onChange={handleChange}
               className="text-textColor font-semibold text-[15px] leading-7 px-4 py-3
 focus:outline-none">
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-                <option value="others">Others</option>
+                <option value="male">{t.male}</option>
+                <option value="female"> {t.female} </option>
+                <option value="others"> {t.others} </option>
               </select>
             </label>
           </div>
@@ -164,7 +257,7 @@ focus:outline-none">
               className=' absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer '
               />
 
-              <label htmlFor="customFile" className=' absolute top-0 left-0 w-full h-full  flex items-center px-[0.75rem] text-[15px] leading-6 overflow-hidden bg-[#0066ff46] text-headingColor font-semibold rounded-lg truncate cursor-pointer  '>Upload Photo</label>
+              <label htmlFor="customFile" className=' absolute top-0 left-0 w-full h-full  flex items-center px-[0.75rem] text-[15px] leading-6 overflow-hidden bg-[#0066ff46] text-headingColor font-semibold rounded-lg truncate cursor-pointer  '>{t.upload}</label>
 
             </div>
           </div>
@@ -174,10 +267,10 @@ focus:outline-none">
             disabled={loading && true}
             
             className='w-full
-             bg-primaryColor text-white text-[18px] leading-[30px] rounded-lg px-4 py-3 ' >{loading ?<HashLoader size={35}color='#ffffff'  /> :'Sign Up'}</button>
+             bg-primaryColor text-white text-[18px] leading-[30px] rounded-lg px-4 py-3 ' >{loading ?<HashLoader size={35}color='#ffffff'  /> :`${t.signup}`}</button>
           </div>
 
-          <p className=' mt-5 text-center text-textColor'> Already have an account?. <Link to='/login' className=' text-primaryColor font-medium ml-1 '>Sign-In</Link></p>
+          <p className=' mt-5 text-center text-textColor'> {t.already} <Link to='/login' className=' text-primaryColor font-medium ml-1 '>{t.signin}</Link></p>
 
           </form>
         </div>

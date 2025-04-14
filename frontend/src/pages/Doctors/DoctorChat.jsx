@@ -10,7 +10,7 @@ const DoctorChat = () => {
     const navigate = useNavigate();
     const appointments = data?.appointements;
     const activeAppointments = appointments?.filter(item => item.status !== 'completed') || [];
-    console.log("dsd",appointments,data)
+    
     return <section>
     <div className=' max-w-[1170px] px-5 mx-auto '>
       {loading && !error && <Loader/>}

@@ -218,10 +218,7 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Language selector component */}
-      <div className="fixed left-[20px] bottom-[30px]">
-        <LanguageSelector />
-      </div>
+      
     </>
   );
   const renderDoctorHome = () => (

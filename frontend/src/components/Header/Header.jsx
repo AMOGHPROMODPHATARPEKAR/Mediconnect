@@ -1,7 +1,7 @@
 import React,{useContext, useEffect,useRef} from 'react'
 import logo from '../../assets/images/logoh.png'
 import {BiMenu} from 'react-icons/bi';
-import {NavLink, Link} from 'react-router-dom';
+import {NavLink, Link, useNavigate} from 'react-router-dom';
 import { authContext } from '../../context/AuthContext.jsx';
 import { LanguageContext } from '../../context/LanguageContext.jsx';
 
@@ -15,12 +15,13 @@ const Header = () => {
   const {dispatch} = useContext(authContext);
  const {translations} = useContext(LanguageContext);
   const {user,role,token} = useContext(authContext);
-
+  const navigate = useNavigate();
 
   const handleLogout =()=>{
     dispatch({
         type:'LOGOUT'
     });
+    navigate('/login')
 }
 
   let status;
@@ -32,7 +33,7 @@ const Header = () => {
       status=false;
     }
 
-    console.log(!status)
+
 
   const navLinks = [
     {
@@ -141,12 +142,12 @@ const Header = () => {
           <img src={user?.photo} alt="" className=' w-full rounded-full' />
           </figure>
           </Link>
-          <button onClick={handleLogout} className=' bg-red-500 py-2 px-6 text-white font-[600] h-[44px] flex items-center justify-center rounded-[50px] '>Logout
+          <button onClick={handleLogout} className=' bg-red-500 py-2 px-6 text-white font-[600] h-[44px] flex items-center justify-center rounded-[50px] '>{translations.logout}
          </button>
         </div>
         ):(
       <Link to='/login'>
-        <button className=' bg-primaryColor py-2 px-6 text-white font-[600] h-[44px] flex items-center justify-center rounded-[50px] '>Login
+        <button className=' bg-primaryColor py-2 px-6 text-white font-[600] h-[44px] flex items-center justify-center rounded-[50px] '>{translations.login}
          </button>
         </Link>
         ) }
