@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 
 import starIcon from '../../assets/images/Star.png'
 import DoctorAbout from './DoctorAbout'
@@ -10,6 +10,7 @@ import Loading from '../../components/Loader/Loading'
 import Error from '../../components/Error/Error.jsx'
 import { BASE_URL } from '../../config.js'
 import { useParams } from 'react-router-dom'
+import { LanguageContext } from '../../context/LanguageContext.jsx'
 
 const DoctorDetails = () => {
 
@@ -19,8 +20,7 @@ const DoctorDetails = () => {
   console.log(id)
   const {data:doctor,loading, error} = useFetchData(`${BASE_URL}/doctor/${id}`)
   const {data:bookedSlots,loading2, error2} = useFetchData(`${BASE_URL}/doctor/${id}/booked-slots`)
-  console.log("hd",doctor)
-  console.log("Boo",bookedSlots)
+const {language }= useContext(LanguageContext)
   const {name
     ,specialization,
     averageRating,
@@ -35,6 +35,34 @@ const DoctorDetails = () => {
     reviews,
     languages
   } = doctor;
+
+  const translation ={
+    'en':{
+      about:'About',
+      feedback:'Feedback',
+    },
+    'kn':{
+      about:'ಬಗ್ಗೆ',
+      feedback:'ಪ್ರತಿಕ್ರಿಯೆ',
+    },
+    'hi':{
+      about:'के बारे में',
+      feedback:'प्रतिक्रिया',
+    },
+    'te':{
+      about:'గురించి',
+      feedback:'ప్రతిస్పందన',
+    },
+    'fr':{
+      about:'À propos',
+      feedback:'Retour d\'information',
+    },
+
+
+  }
+const t = translation[language]
+  const aboutText = t.about;
+  const feedbackText = t.feedback;
 
   return <section>
     <div className="max-w-[1170px] px-5 mx-auto">
@@ -76,29 +104,29 @@ text-textColor">({totalRating})</span>
             tab==="about" && "border-b border-solid ☐ border-primaryColor"}
             py-2 px-5 mr-5 text-[16px] leading-7 text-headingColor font-semibold`}
 
-          >About</button>
+          >{aboutText}</button>
           <button onClick={()=>setTab('feedback')}
           className={`${
             tab==="feedback" && "border-b border-solid ☐ border-primaryColor"}
             py-2 px-5 mr-5 text-[16px] leading-7 text-headingColor font-semibold`}
 
-          >Feedback</button>
+          >{feedbackText}</button>
         </div>
         
 
         <div className=' mt-[50px] '>
           {
-            tab === 'about' && <DoctorAbout name={name}about={about} qualifications={qualifications} experiences={experiences} languages={languages}  />
+            tab === 'about' && <DoctorAbout name={name}about={about} qualifications={qualifications} experiences={experiences} languages={languages} language={language}  />
           }
           {
-            tab === 'feedback' && <Feedback reviews={reviews} totalRating={totalRating} />
+            tab === 'feedback' && <Feedback reviews={reviews} totalRating={totalRating} language={language} />
           }
         </div>
           
         </div>
 
         <div>
-          <SlidePanel doctorId={doctor._id} ticketPrice={ticketPrice} timeSlots={timeSlots} bookedSlots ={bookedSlots } />
+          <SlidePanel doctorId={doctor._id} ticketPrice={ticketPrice} timeSlots={timeSlots} bookedSlots ={bookedSlots } language={language} />
         </div>
       </div>
     )}

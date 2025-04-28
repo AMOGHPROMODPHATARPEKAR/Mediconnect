@@ -309,7 +309,7 @@ const diseaseToSpecialist = {
     "Hypoglycemia": "Endocrinologist",
     "Osteoarthritis": "Orthopedist",
     "Arthritis": "Rheumatologist",
-    "(vertigo) Paroxysmal Positional Vertigo": "ENT Specialist",
+    "(vertigo) Paroymsal  Positional Vertigo": "ENT Specialist",
     "Acne": "Dermatologist",
     "Urinary tract infection": "Urologist",
     "Psoriasis": "Dermatologist",
@@ -339,10 +339,10 @@ export const getSpecialist = async (req, res) => {
         }
 
         // Map disease to specialization
-        const specialization = diseaseToSpecialist[disease];
+        let specialization = diseaseToSpecialist[disease];
         console.log(specialization);
         if (!specialization) {
-            return res.status(404).json({ error: "No specialist found for this disease" });
+            specialization = "General Practitioner";
         }
 
         // Query MongoDB for doctors with the given specialization

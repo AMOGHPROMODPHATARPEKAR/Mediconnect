@@ -8,7 +8,7 @@ export const updateUser = async(req,res)=>{
 
     const id =  req.params.id;
     
-    
+    console.log("update user",req.body)
 
     try {
 

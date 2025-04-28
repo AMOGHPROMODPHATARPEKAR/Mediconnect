@@ -26,6 +26,7 @@ import {
 import { Upload, X, FileText, Eye } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import {token} from '../../config.js'
+import uploadToCloudinary from '../../utils/uploadToCloudinary.js'
 
 const Appointments = ({ appointments }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -35,42 +36,83 @@ const Appointments = ({ appointments }) => {
   const [fileUrl, setFileUrl] = useState('');
   const [uploading, setUploading] = useState(false);
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
-  const [selectedImage, setSelectedImage] = useState(null);
   const [loadingImage, setLoadingImage] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [selectedPDF, setSelectedPDF] = useState(null);
+  const [fileType, setFileType] = useState(null); // 'image' or 'pdf'
+
+  
 
   const navigate = useNavigate()
 
   const activeAppointments = appointments?.filter(item => item.status !== 'completed') || [];
 
-  const handleViewRecord = async (record,id) => {
+  // const handleViewRecord = async (record,id) => {
+  //   setLoadingImage(true);
+  //   try {
+  //     const response = await fetch(`/api/v1/ipfs/getImage?userId=${id}`, {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //         Authorization: `Bearer ${token}`
+  //       },
+  //       body: JSON.stringify({
+  //         ipfsHash: record.ipfsHash
+  //       })
+  //     });
+
+  //     if (!response.ok) {
+  //       throw new Error('Failed to fetch image');
+  //     }
+
+  //     const data = await response.json();
+  //     setSelectedImage(`data:image/jpeg;base64,${data.depcryptedImage}`);
+  //     setImageDialogOpen(true);
+  //   } catch (error) {
+  //     console.error('Error fetching image:', error);
+  //   } finally {
+  //     setLoadingImage(false);
+  //   }
+  // };
+
+  const handleViewRecord = async (record, id) => {
     setLoadingImage(true);
     try {
       const response = await fetch(`/api/v1/ipfs/getImage?userId=${id}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          ipfsHash: record.ipfsHash
-        })
+        body: JSON.stringify({ ipfsHash: record.ipfsHash }),
       });
-
+  
       if (!response.ok) {
-        throw new Error('Failed to fetch image');
+        throw new Error('Failed to fetch file');
       }
-
+  
       const data = await response.json();
-      setSelectedImage(`data:image/jpeg;base64,${data.depcryptedImage}`);
+  
+      // Check if it's a PDF or image based on the format returned
+      const base64Data = data.depcryptedImage;
+      const isPDF = base64Data.startsWith('JVBER'); // Basic PDF file signature
+  
+      if (isPDF) {
+        setFileType('pdf');
+        setSelectedPDF(`data:application/pdf;base64,${base64Data}`);
+      } else {
+        setFileType('image');
+        setSelectedImage(`data:image/jpeg;base64,${base64Data}`);
+      }
+  
       setImageDialogOpen(true);
     } catch (error) {
-      console.error('Error fetching image:', error);
+      console.error('Error fetching file:', error);
     } finally {
       setLoadingImage(false);
     }
   };
-
-
+  
 
   const handleFileSelect = (event) => {
     const file = event.target.files[0];
@@ -327,38 +369,24 @@ const Appointments = ({ appointments }) => {
       </Dialog>
 
       {/* Image Viewing Dialog */}
-      <Dialog
-        open={imageDialogOpen}
-        onClose={() => {
-          setImageDialogOpen(false);
-          setSelectedImage(null);
-        }}
-        maxWidth="md"
-        fullWidth
-      >
-        <DialogTitle>View Document</DialogTitle>
-        <DialogContent>
-          {selectedImage && (
-            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
-              <img 
-                src={selectedImage} 
-                alt="Medical Record" 
-                style={{ maxWidth: '100%', maxHeight: '70vh' }}
-              />
-            </Box>
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Button 
-            onClick={() => {
-              setImageDialogOpen(false);
-              setSelectedImage(null);
-            }}
-          >
-            Close
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <Dialog open={imageDialogOpen} onClose={() => setImageDialogOpen(false)} maxWidth="md" fullWidth>
+  <DialogTitle>Record Preview</DialogTitle>
+  <DialogContent>
+    {fileType === 'image' && (
+      <img src={selectedImage} alt="Record" style={{ width: '100%', maxHeight: '80vh', objectFit: 'contain' }} />
+    )}
+    {fileType === 'pdf' && (
+      <iframe
+        src={selectedPDF}
+        title="PDF Record"
+        width="100%"
+        height="600px"
+        style={{ border: 'none' }}
+      />
+    )}
+  </DialogContent>
+</Dialog>
+
     </div>
   );
 };

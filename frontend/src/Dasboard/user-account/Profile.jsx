@@ -105,7 +105,7 @@ const Profile = ({user}) => {
     try {
       console.log(file,uploadingRecord)
       const data = await uploadToCloudinary(file)
-      console.log("jfjdS",data)
+      
       if (!data) throw new Error("Upload failed")
       setFormData({...formData, photo: data.url})
     } catch (error) {
@@ -121,6 +121,7 @@ const Profile = ({user}) => {
     setLoading(true)
 
     try {
+      console.log("uodate ",formData)
       const res = await fetch(`/api/v1/user/${user._id}`, {
         method: 'put',
         headers: {

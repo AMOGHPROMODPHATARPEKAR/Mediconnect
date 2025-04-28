@@ -10,18 +10,7 @@ const CheckoutSuccess = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  useEffect(() => {
-    const searchParams = new URLSearchParams(location.search);
-    const status = searchParams.get('status');
-    
-    if (status === 'success') {
-      // Only create booking after successful calendar authentication
-      handleSuccessfulAuthentication();
-    } else if (status === 'error') {
-      toast.error('Google Calendar authentication failed');
-      setLoader(false);
-    }
-  }, [location]);
+console.log(time, "time")
 
   const checkCalendarAvailability = async () => {
     try {
@@ -32,6 +21,7 @@ const CheckoutSuccess = () => {
           'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({
+          time: time,
           start: new Date(time).toISOString(),
           timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
           duration: 60,
@@ -82,12 +72,13 @@ const CheckoutSuccess = () => {
           summary: `Appointment with Dr. ${bookingResult?.data?.doctor?.name}`,
           location: bookingResult?.data?.doctor?.location,
           description: `Your appointment is scheduled with Dr. ${bookingResult?.data?.doctor?.name}.`,
+          time:time,
           start: new Date(time).toISOString(),
           timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
           duration: 60,
           userEmail: bookingResult?.data?.user?.email,
           doctorId,
-          time
+        
         }),
       });
       const calendarResult = await calendarResponse.json();

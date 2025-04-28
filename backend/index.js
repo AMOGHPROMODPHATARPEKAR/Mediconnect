@@ -113,7 +113,7 @@ app.get('/google/redirect',async (req,res)=>{
     const  code = req.query.code;
     const {tokens} = await oauth2Client.getToken(code)
     oauth2Client.setCredentials(tokens);
-  
+    console.log("calender",req.query.state)
     res.redirect(`http://localhost:5173/checkout-success/${req.query.state}?status=success`);
   } catch (error) {
     console.log(error)
@@ -123,7 +123,7 @@ app.get('/google/redirect',async (req,res)=>{
 
 app.post('/schedule_event', async (req, res) => {
   const { doctorId, time, summary, location, description, start, timeZone, duration, userEmail } = req.body;
-
+  console.log("time",time,start)
   try {
     // Check authentication
     if (!oauth2Client.credentials.access_token) {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Box, Button, Container, TextField, Typography, Paper, List, ListItem, ListItemText,Select,
+import { Box, Button, Container, TextField, Typography, Paper, List, ListItem, ListItemText, Select,
   MenuItem,
   FormControl,
   InputLabel } from '@mui/material';
@@ -28,6 +28,8 @@ const getSystemMessage = (lang) => ({
     "flag": true,
     "symptoms": "Comma-separated list of symptoms in English for internal processing"
   }
+  
+  If the user mentions fewer than 2 symptoms, respond with a request for more symptoms for better accuracy. Include any already identified symptoms in your response.
   
   If no symptoms are detected, respond normally in ${LANGUAGES[lang].name} with JSON flag=false.
   Always prioritize accurate symptom identification while maintaining natural conversation in the selected language.`
@@ -99,7 +101,7 @@ const INTERFACE_TEXT = {
     }
   },
   'ta': {
-    title: 'மெடிகனெக்ட் போட்',
+    title: 'மெடிகனெக்ட் போட்',
     messageLabel: 'உங்கள் செய்தியை டைப் செய்யவும்...',
     sendButton: 'அனுப்பு',
     voiceButton: 'குரல்',
@@ -144,7 +146,9 @@ const ChatBot = () => {
     conversationHistory: [],
     doctors: [],
     selectedLanguage: '',
-    hasSelectedLanguage: false
+    hasSelectedLanguage: false,
+    savedSymptoms: [], // Add state for saved symptoms
+    symptomCount: 0    // Track the number of symptoms
   });
 
   // Initialize speech recognition
@@ -175,7 +179,9 @@ const ChatBot = () => {
       ...prev, 
       selectedLanguage: lang,
       hasSelectedLanguage: true,
-      conversationHistory: [getSystemMessage(lang)]
+      conversationHistory: [getSystemMessage(lang)],
+      savedSymptoms: [],
+      symptomCount: 0
     }));
   };
 
@@ -230,11 +236,10 @@ const ChatBot = () => {
   const fetchDoctorRecommendations = useCallback(async (disease) => {
     try {
       const token = localStorage.getItem('token');
-      console.log("token ",token)
+      console.log("token ", token);
       const response = await axios.post(
         `http://localhost:8000/api/v1/doctor/specialist`,
-        { disease ,lang: state.selectedLanguage},
-        
+        { disease, lang: state.selectedLanguage },
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -244,7 +249,35 @@ const ChatBot = () => {
     } catch (error) {
       console.error('Error fetching doctors:', error);
     }
-  }, []);
+  }, [state.selectedLanguage]);
+
+  // Update saved symptoms and check if we have enough for diagnosis
+  const processSymptoms = useCallback((newSymptoms) => {
+    if (!newSymptoms) return { combinedSymptoms: '', hasEnoughSymptoms: false };
+    
+    const symptomArray = newSymptoms.split(',').map(s => s.trim()).filter(s => s);
+    
+    // Update saved symptoms with new unique ones
+    const updatedSymptoms = [...state.savedSymptoms];
+    
+    symptomArray.forEach(symptom => {
+      if (!updatedSymptoms.includes(symptom)) {
+        updatedSymptoms.push(symptom);
+      }
+    });
+    
+    // Update state with new symptoms
+    setState(prev => ({
+      ...prev,
+      savedSymptoms: updatedSymptoms,
+      symptomCount: updatedSymptoms.length
+    }));
+    
+    const combinedSymptoms = updatedSymptoms.join(', ');
+    const hasEnoughSymptoms = updatedSymptoms.length > 2;
+    
+    return { combinedSymptoms, hasEnoughSymptoms };
+  }, [state.savedSymptoms]);
 
   const handleSendMessage = async () => {
     if (!state.newMessage.trim() || !state.openai) return;
@@ -265,17 +298,25 @@ const ChatBot = () => {
         parsedResponse = { response: responseText, flag: false };
       }
 
-      // console.log("syb",parsedResponse.symptoms)
-      if (parsedResponse.flag) {
-        const diseaseResponse = await axios.post('http://127.0.0.1:5000/predict-disease', {
-          symptoms: parsedResponse.symptoms,
-        });
+      console.log(parsedResponse)
 
-        
-        const disease = diseaseResponse.data.disease;
-        parsedResponse.response += `\nPredicted Disease: ${disease}`;
-        
-        await fetchDoctorRecommendations(disease);
+      if (parsedResponse.symptoms) {
+        const { combinedSymptoms, hasEnoughSymptoms } = processSymptoms(parsedResponse.symptoms);
+        console.log(hasEnoughSymptoms)
+        if (hasEnoughSymptoms) {
+          // We have enough symptoms, proceed with disease prediction
+          const diseaseResponse = await axios.post('http://127.0.0.1:5000/predict-disease', {
+            symptoms: combinedSymptoms,
+          });
+          
+          const disease = diseaseResponse.data.disease;
+          parsedResponse.response += `\nPredicted Disease: ${disease}`;
+          
+          await fetchDoctorRecommendations(disease);
+        } else {
+          // Not enough symptoms, response should already ask for more
+          // The system message has been updated to handle this case
+        }
       }
 
       setState(prev => ({
@@ -433,6 +474,14 @@ const ChatBot = () => {
           {state.isListening ? texts.listeningText : texts.voiceButton}
         </Button>
       </Box>
+
+      {state.savedSymptoms.length > 0 && (
+        <Box mt={2} p={2} sx={{ bgcolor: 'rgba(220, 255, 220, 0.3)', borderRadius: 1 }}>
+          <Typography variant="subtitle2" gutterBottom>
+            Symptoms identified: {state.savedSymptoms.join(', ')}
+          </Typography>
+        </Box>
+      )}
 
       {state.doctors.length > 0 && (
         <Box mt={4}>

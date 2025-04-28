@@ -15,7 +15,7 @@ const FeedbackForm = () => {
    const {id} = useParams()
 
    const handleSubmitReview = async (e)=>{
-    e.preventDefault();
+    // e.preventDefault();
 
     setLoading(true)
 

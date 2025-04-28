@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useContext } from 'react';
 import DoctorCard from '../../components/Doctors/DoctorCard';
 import Testimonial from '../../components/Testimonial/Testimonial';
 import useFetchData from '../../hooks/useFetchData';
@@ -6,7 +6,7 @@ import Loading from '../../components/Loader/Loading';
 import Error from '../../components/Error/Error';
 import { BASE_URL } from '../../config';
 import { Mic, MicOff } from 'lucide-react';
-
+import { LanguageContext } from '../../context/LanguageContext';
 
 const LANGUAGES = {
   'en': {
@@ -180,7 +180,7 @@ const translateText = async (text, fromLang, toLang) => {
 
 const Doctors = () => {
   const [query, setQuery] = useState('');
-  const [selectedLanguage, setSelectedLanguage] = useState('en');
+  // const [selectedLanguage, setSelectedLanguage] = useState('en');
   const [isListening, setIsListening] = useState(false);
   const [isTranslating, setIsTranslating] = useState(false);
   const [recognition, setRecognition] = useState(null);
@@ -191,6 +191,8 @@ const Doctors = () => {
     specialization: '',
     languages: []
   });
+
+  const {language:selectedLanguage} = useContext(LanguageContext);
   
   // Store the current transcript in progress
   const [currentTranscript, setCurrentTranscript] = useState('');
@@ -206,7 +208,7 @@ const Doctors = () => {
   // Debounced search function
   const searchDoctors = async (searchQuery, doctors) => {
     if (!doctors) return [];
-    
+    console.log("Seacr",searchQuery)
     let filtered = [...doctors];
     setTranslationError(null);
     
@@ -228,10 +230,11 @@ const Doctors = () => {
           console.log('Translating query:', searchQuery, selectedLanguage);
           const data = await translateText(searchQuery, selectedLanguage, 'en');
           console.log('Translated query:', data);
+          translatedData = data;
           // console.log(`Translated query from ${selectedLanguage} to English:`, translatedQuery);
         }
         
-        const searchTerms = translatedData?.translated_text.toLowerCase().split(' ').filter(term => term);
+        const searchTerms = translatedData?.toLowerCase().split(' ').filter(term => term);
         console.log('Search terms:', searchTerms);
         filtered = filtered.filter(doctor => {
           const searchableFields = [
@@ -248,7 +251,7 @@ const Doctors = () => {
           );
         });
       } catch (error) {
-        setTranslationError(texts.error);
+        // setTranslationError(texts.error);
         console.error('Search error:', error);
       } finally {
         setIsTranslating(false);
@@ -410,19 +413,7 @@ const Doctors = () => {
     <>
       <section className='bg-[#fff9ea]'>
         <div className='container text-center'>
-          <div className="mb-4">
-            <select 
-              value={selectedLanguage}
-              onChange={(e) => setSelectedLanguage(e.target.value)}
-              className="py-2 px-4 rounded-md border border-gray-300 focus:outline-none focus:border-primary"
-            >
-              {Object.entries(LANGUAGES).map(([code, lang]) => (
-                <option key={code} value={code}>
-                  {lang.name}
-                </option>
-              ))}
-            </select>
-          </div>
+         
           
           <h2 className='heading'>{texts?.findDoctor}</h2>
           <div className="max-w-[570px] mt-[30px] mx-auto bg-[#0066ff2c] rounded-md flex items-center justify-between relative">

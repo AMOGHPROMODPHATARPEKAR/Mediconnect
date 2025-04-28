@@ -27,7 +27,7 @@ export const sendVerificationEmail = async(req,res) => {
 const sendAppointmentEmail = async(req,res) => {
 
   const {  email,username,doctorName,date} = req.body;
-  
+  console.log("email",email,username,doctorName,date)
   try {
    await resend.emails.send({
         from: 'onboarding@resend.dev',

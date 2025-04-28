@@ -40,7 +40,30 @@ const TRANSLATIONS = {
     viewProfile: 'ವೈದ್ಯರ ಪ್ರೊಫೈಲ್ ವೀಕ್ಷಿಸಿ',
     delete: 'ಬುಕ್ಕಿಂಗ್ ಅಳಿಸಿ',
     ratings: 'ರೇಟಿಂಗ್‌ಗಳು',
-  }
+  },
+  'te': {
+    at: 'లో',
+    location: 'ప్రదేశం',
+    languages: 'భాషలు',
+    deleteSuccess: 'బుకింగ్ విజయవంతంగా తొలగించబడింది',
+    deleteEmailSent: 'బుకింగ్ తొలగింపు ఇమెయిల్ పంపబడింది',
+    chat: 'డాక్టర్‌తో చాట్ చేయండి',
+    viewProfile: 'డాక్టర్ ప్రొఫైల్ చూడండి',
+    delete: 'బుకింగ్ తొలగించు',
+    ratings: 'రేటింగ్స్',
+  },
+  'fr': {
+    at: 'À',
+    location: 'Emplacement',
+    languages: 'Langues',
+    deleteSuccess: 'Réservation supprimée avec succès',
+    deleteEmailSent: 'E-mail de suppression de réservation envoyé',
+    chat: 'Discuter avec le médecin',
+    viewProfile: 'Voir le profil du médecin',
+    delete: 'Supprimer la réservation',
+    ratings: 'évaluations',
+  },  
+
 };
 
 const DoctorCard = ({ doctor, booking, bookingId, language = 'en' }) => {
